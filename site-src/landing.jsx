@@ -6,8 +6,8 @@ import { createRoot } from "react-dom/client";
 
 const DISCORD_URL = null; // Set to the invite link once the server exists; until then the button shows "coming soon".
 const DEVLOG_BASE = "devlog/";
-// Alpha download: no sign-up. The Windows button links the newest launcher zip published on the site repo's
-// releases (or the newest game zip until a launcher is published); alpha/download.html has the same button.
+// Alpha download: no sign-up, Windows only. The button links the newest installer (AltarholdSetup-*.exe) published
+// on the site repo's releases, else the newest launcher zip, else the newest game zip; alpha/download.html has the same button.
 const RELEASES_REPO = "icyrequiem/altarhold";
 const FALLBACK_DOWNLOAD = `https://github.com/${RELEASES_REPO}/releases/download/v0.2.0-alpha/RelicProtocol-0.2.0-alpha-windows.zip`;
 
@@ -170,21 +170,21 @@ function Hero() {
 }
 
 const ALPHA_STEPS = [
-	{ n: "01", title: "Download", body: "Get the Windows launcher. No account or sign-up needed." },
-	{ n: "02", title: "Install", body: "Unzip it somewhere you can write to, like your Desktop, and run AltarholdLauncher.exe. It installs and updates the game." },
+	{ n: "01", title: "Download", body: "Get the Windows installer. No account or sign-up needed." },
+	{ n: "02", title: "Install", body: "Run AltarholdSetup.exe. It adds Altarhold to your Desktop and Start menu; the launcher then installs and updates the game." },
 	{ n: "03", title: "Play and report", body: "Press Play, fight bots or other players on our server, then tell us what broke." },
 ];
 
 const DOWNLOAD_PAGE = "alpha/download.html";
 
-// The newest published Windows launcher zip, else the newest game zip, from the site repo's releases.
+// The newest published Windows installer, else launcher zip, else game zip, from the site repo's releases.
 function useWindowsDownload() {
 	const [download, setDownload] = useState({ url: FALLBACK_DOWNLOAD, launcher: false });
 	useEffect(() => {
-		const find = (releases, prefix) => {
+		const find = (releases, prefix, suffix = "-windows.zip") => {
 			for (const release of releases) {
 				if (release.draft || !/^v\d/.test(release.tag_name)) continue;
-				const asset = (release.assets || []).find((a) => a.name.startsWith(prefix) && a.name.endsWith("-windows.zip") && /\d/.test(a.name.charAt(prefix.length)));
+				const asset = (release.assets || []).find((a) => a.name.startsWith(prefix) && a.name.endsWith(suffix) && /\d/.test(a.name.charAt(prefix.length)));
 				if (asset) return asset.browser_download_url;
 			}
 			return null;
@@ -193,7 +193,7 @@ function useWindowsDownload() {
 			.then((response) => (response.ok ? response.json() : []))
 			.then((releases) => {
 				if (!Array.isArray(releases)) return;
-				const launcher = find(releases, "AltarholdLauncher-");
+				const launcher = find(releases, "AltarholdSetup-", ".exe") ?? find(releases, "AltarholdLauncher-");
 				const game = find(releases, "Altarhold-") ?? find(releases, "RelicProtocol-");
 				if (launcher || game) setDownload({ url: launcher ?? game, launcher: Boolean(launcher) });
 			})
