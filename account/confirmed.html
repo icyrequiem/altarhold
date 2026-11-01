@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="robots" content="noindex, nofollow">
+	<title>Email confirmed · Relic Protocol</title>
+	<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+	<header>
+		<a class="brand" href="../">Relic Protocol</a>
+		<nav><a href="../">Home</a><a href="../timeline.html">Timeline</a></nav>
+	</header>
+	<main>
+		<h1 id="title">Email confirmed</h1>
+		<p class="lead" id="message">Your Relic Protocol account is ready. Go back to the game, open <strong>Play online</strong> and sign in with your email and password.</p>
+		<p id="hint">You can close this page.</p>
+	</main>
+	<script>
+		// Supabase sends players here after the link in the confirmation email.
+		// It confirms the account first, then adds either a session or an error
+		// after the #. The game signs in by itself, so the session is not used:
+		// it is removed from the address bar straight away.
+		(function () {
+			var hash = new URLSearchParams(window.location.hash.slice(1));
+			if (window.location.hash) {
+				history.replaceState(null, "", window.location.pathname);
+			}
+			var error = hash.get("error_description") || hash.get("error");
+			if (error) {
+				document.getElementById("title").textContent = "That link didn't work";
+				var expired = (hash.get("error_code") || "").indexOf("expired") !== -1;
+				document.getElementById("message").textContent = expired
+					? "The link has expired or was already used. If you can sign in to the game, your account is confirmed. Otherwise press Create account again with the same email to get a new link."
+					: "Supabase said: " + error.replace(/\+/g, " ") + ". Try signing in to the game; if that fails, create the account again.";
+				document.getElementById("hint").textContent = "";
+			}
+		})();
+	</script>
+</body>
+</html>
