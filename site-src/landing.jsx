@@ -146,6 +146,7 @@ function Glass({ className = "", children }) {
 function Hero() {
 	return (
 		<section className="relative pt-16 pb-20 sm:pt-24 sm:pb-28">
+			<img src="img/logo/altarhold-logo.svg" alt="" aria-hidden="true" width="420" height="190" className="mb-10 w-64 max-w-full drop-shadow-[0_0_40px_rgba(199,156,255,0.25)] sm:w-96" />
 			<p className="font-mono text-xs uppercase tracking-[0.3em] text-cyan-300/80">5v5 · Godot · In development</p>
 			<h1 className="mt-6 font-display text-5xl font-bold uppercase leading-[0.95] tracking-tight text-white sm:text-7xl lg:text-8xl [text-wrap:balance]">
 				No dashes.<br />No shops.<br />
@@ -481,7 +482,7 @@ function AltarholdLanding() {
 
 			<div className="relative mx-auto max-w-6xl px-4 sm:px-8">
 				<header className="flex items-center justify-between py-6">
-					<span className="font-display text-xl font-bold uppercase tracking-[0.2em] text-white">Altarhold</span>
+					<a href="./" className="block shrink-0"><img src="img/logo/altarhold-emblem.svg" alt="Altarhold" width="36" height="40" className="h-10 w-auto sm:hidden" /><img src="img/logo/altarhold-wordmark.svg" alt="Altarhold" width="210" height="40" className="hidden h-10 w-auto sm:block" /></a>
 					<nav className="flex gap-6 font-mono text-xs uppercase tracking-widest text-slate-400">
 						<a href="#alpha" className="hover:text-cyan-200">Alpha</a>
 						<a href="#heroes" className="hover:text-cyan-200">Heroes</a>
