@@ -23,16 +23,17 @@
 		<p class="lead">This page is for registered testers. Please don't share this link. Friends who want to play can register on the home page.</p>
 
 		<p>
-			<a class="download" id="win" href="#">Download for Windows</a>
-			<a class="download secondary" id="linux" href="#">Linux</a>
+			<a class="download" id="launcher-win" href="#">Download the launcher for Windows</a>
+			<a class="download secondary" id="launcher-linux" href="#">Linux launcher</a>
 		</p>
+		<p class="meta" id="game-only">Or the game on its own: <a id="win" href="#">Windows zip</a> · <a id="linux" href="#">Linux zip</a></p>
 
 		<h2>Getting started</h2>
 		<ol>
-			<li>Unzip the whole folder, then double-click <strong>Altarhold.exe</strong> (builds up to 0.2.0 call it RelicProtocol.exe).</li>
+			<li>Unzip the launcher somewhere you can write to, such as your Desktop or Documents (not Program Files), then double-click <strong>AltarholdLauncher.exe</strong>.</li>
 			<li>Windows may say "Windows protected your PC" because the alpha isn't code-signed yet. Click <strong>More info</strong>, then <strong>Run anyway</strong>.</li>
-			<li>Press <strong>Play online</strong>. The test server is already filled in: type your name, press Connect, pick a hero and press Ready. Bots fill empty seats.</li>
-			<li>If the game says your version is out of date, come back here for the newest build.</li>
+			<li>The launcher downloads the game, keeps it up to date and shows the patch notes. Press <strong>Play</strong> when it's ready.</li>
+			<li>In the game, press <strong>Play online</strong>, pick a hero and press Ready. Bots fill empty seats.</li>
 		</ol>
 
 		<h2>Controls</h2>
@@ -40,32 +41,46 @@
 	</main>
 	<footer>© 2026 Ynairally</footer>
 	<script>
-		// The newest published release on the site repo is the current tester build, so a new
-		// release updates this page by itself. FALLBACK_VERSION is used if GitHub cannot be reached.
+		// Reads the site repo's published releases, so a new release updates this page by itself.
+		// The launcher keeps its own version number, so its zip may sit in an older release than the game's.
+		// Fallbacks are used if GitHub cannot be reached.
 		const REPO = "icyrequiem/project-altar";
-		const FALLBACK_VERSION = "0.2.0-alpha";
+		const FALLBACK_VERSION = "0.2.0-alpha"; // builds up to 0.2.0-alpha were named RelicProtocol-*
+		const RELEASES = `https://github.com/${REPO}/releases`;
 
-		// Builds up to 0.2.0-alpha were named RelicProtocol-*; later ones are Altarhold-*.
-		// A release's own asset list wins when GitHub answers.
-		function show(version, assets) {
-			const prefix = FALLBACK_VERSION === version ? "RelicProtocol" : "Altarhold";
-			const base = `https://github.com/${REPO}/releases/download/v${version}/${prefix}-${version}-`;
-			const pick = (suffix) => {
-				const asset = (assets || []).find((a) => a.name.endsWith(suffix));
-				return asset ? asset.browser_download_url : base + suffix;
-			};
-			document.getElementById("win").href = pick("windows.zip");
-			document.getElementById("linux").href = pick("linux.zip");
+		// The newest asset whose name starts with prefix and ends with "-<os>.zip".
+		function newest(releases, prefix, os) {
+			for (const release of releases) {
+				if (release.draft || !/^v\d/.test(release.tag_name)) continue;
+				const asset = (release.assets || []).find((a) => a.name.startsWith(prefix) && a.name.endsWith(`-${os}.zip`) && /\d/.test(a.name.charAt(prefix.length)));
+				if (asset) return { url: asset.browser_download_url, release };
+			}
+			return null;
+		}
+
+		function show(releases) {
+			const game = { windows: newest(releases, "Altarhold-", "windows"), linux: newest(releases, "Altarhold-", "linux") };
+			const launcher = { windows: newest(releases, "AltarholdLauncher-", "windows"), linux: newest(releases, "AltarholdLauncher-", "linux") };
+			const fallback = (os) => `${RELEASES}/download/v${FALLBACK_VERSION}/RelicProtocol-${FALLBACK_VERSION}-${os}.zip`;
+			for (const os of ["windows", "linux"]) {
+				const id = os === "windows" ? "win" : "linux";
+				document.getElementById(id).href = game[os] ? game[os].url : fallback(os);
+				const button = document.getElementById(`launcher-${id}`);
+				button.href = launcher[os] ? launcher[os].url : document.getElementById(id).href;
+				button.textContent = launcher[os]
+					? (os === "windows" ? "Download the launcher for Windows" : "Linux launcher")
+					: (os === "windows" ? "Download for Windows" : "Linux");
+			}
+			// Until a launcher is published, the big buttons already are the game zips.
+			document.getElementById("game-only").hidden = !launcher.windows;
+			const version = game.windows ? game.windows.release.tag_name.slice(1) : FALLBACK_VERSION;
 			for (const el of document.querySelectorAll(".version")) el.textContent = version;
 		}
 
-		show(FALLBACK_VERSION);
-		fetch(`https://api.github.com/repos/${REPO}/releases?per_page=10`)
+		show([]);
+		fetch(`https://api.github.com/repos/${REPO}/releases?per_page=20`)
 			.then((response) => (response.ok ? response.json() : []))
-			.then((releases) => {
-				const latest = releases.find((r) => !r.draft && /^v\d/.test(r.tag_name));
-				if (latest) show(latest.tag_name.slice(1), latest.assets);
-			})
+			.then((releases) => show(Array.isArray(releases) ? releases : []))
 			.catch(() => {});
 	</script>
 </body>
