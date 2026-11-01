@@ -40,12 +40,26 @@
 	</main>
 	<footer>© 2026 Ynairally</footer>
 	<script>
-		// Set to each new tester build; the zips are attached to the site repo's release of the same tag.
-		const DOWNLOAD_VERSION = "0.1.0-alpha";
-		const base = `https://github.com/icyrequiem/project-altar/releases/download/v${DOWNLOAD_VERSION}/RelicProtocol-${DOWNLOAD_VERSION}-`;
-		document.getElementById("win").href = base + "windows.zip";
-		document.getElementById("linux").href = base + "linux.zip";
-		for (const el of document.querySelectorAll(".version")) el.textContent = DOWNLOAD_VERSION;
+		// The newest published release on the site repo is the current tester build, so a new
+		// release updates this page by itself. FALLBACK_VERSION is used if GitHub cannot be reached.
+		const REPO = "icyrequiem/project-altar";
+		const FALLBACK_VERSION = "0.1.1-alpha";
+
+		function show(version) {
+			const base = `https://github.com/${REPO}/releases/download/v${version}/RelicProtocol-${version}-`;
+			document.getElementById("win").href = base + "windows.zip";
+			document.getElementById("linux").href = base + "linux.zip";
+			for (const el of document.querySelectorAll(".version")) el.textContent = version;
+		}
+
+		show(FALLBACK_VERSION);
+		fetch(`https://api.github.com/repos/${REPO}/releases?per_page=10`)
+			.then((response) => (response.ok ? response.json() : []))
+			.then((releases) => {
+				const latest = releases.find((r) => !r.draft && /^v\d/.test(r.tag_name));
+				if (latest) show(latest.tag_name.slice(1));
+			})
+			.catch(() => {});
 	</script>
 </body>
 </html>
