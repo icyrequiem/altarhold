@@ -3,9 +3,9 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="robots" content="noindex, nofollow">
 	<link rel="icon" type="image/svg+xml" href="../img/logo/altarhold-emblem.svg">
-	<title>Alpha download · Altarhold</title>
+	<title>Download the alpha · Altarhold</title>
+	<meta name="description" content="Download the Altarhold alpha launcher for Windows. Free, no sign-up.">
 	<link rel="stylesheet" href="../style.css">
 	<style>
 		.download { display: inline-block; padding: 12px 20px; border-radius: 8px; background: var(--accent); color: #0f1218; font-weight: 700; text-decoration: none; margin: 6px 12px 6px 0; }
@@ -19,15 +19,14 @@
 		<nav><a href="../">Home</a><a href="../timeline.html">Timeline</a></nav>
 	</header>
 	<main>
-		<h1>Thanks for joining the alpha</h1>
-		<div class="meta">Closed alpha · build <span class="version">0.1.0-alpha</span></div>
-		<p class="lead">This page is for registered testers. Please don't share this link. Friends who want to play can register on the home page.</p>
+		<h1>Download the alpha</h1>
+		<div class="meta">Alpha · build <span class="version">0.2.0-alpha</span> · Windows</div>
+		<p class="lead">Free to download, no sign-up. Share it with friends: more players means fewer bots.</p>
 
 		<p>
 			<a class="download" id="launcher-win" href="#">Download the launcher for Windows</a>
-			<a class="download secondary" id="launcher-linux" href="#">Linux launcher</a>
 		</p>
-		<p class="meta" id="game-only">Or the game on its own: <a id="win" href="#">Windows zip</a> · <a id="linux" href="#">Linux zip</a></p>
+		<p class="meta" id="game-only">Or the game on its own: <a id="win" href="#">Windows zip</a></p>
 
 		<h2>Getting started</h2>
 		<ol>
@@ -60,24 +59,18 @@
 		}
 
 		function show(releases) {
-			const game = { windows: newest(releases, "Altarhold-", "windows"), linux: newest(releases, "Altarhold-", "linux") };
-			const launcher = { windows: newest(releases, "AltarholdLauncher-", "windows"), linux: newest(releases, "AltarholdLauncher-", "linux") };
-			const fallback = (os) => `${RELEASES}/download/v${FALLBACK_VERSION}/RelicProtocol-${FALLBACK_VERSION}-${os}.zip`;
-			for (const os of ["windows", "linux"]) {
-				const id = os === "windows" ? "win" : "linux";
-				document.getElementById(id).href = game[os] ? game[os].url : fallback(os);
-				const button = document.getElementById(`launcher-${id}`);
-				button.href = launcher[os] ? launcher[os].url : document.getElementById(id).href;
-				button.textContent = launcher[os]
-					? (os === "windows" ? "Download the launcher for Windows" : "Linux launcher")
-					: (os === "windows" ? "Download for Windows" : "Linux");
-			}
-			// Until a launcher is published, the big buttons already are the game zips.
-			document.getElementById("game-only").hidden = !launcher.windows;
-			const version = game.windows ? game.windows.release.tag_name.slice(1) : FALLBACK_VERSION;
+			const game = newest(releases, "Altarhold-", "windows");
+			const launcher = newest(releases, "AltarholdLauncher-", "windows");
+			const fallback = `${RELEASES}/download/v${FALLBACK_VERSION}/RelicProtocol-${FALLBACK_VERSION}-windows.zip`;
+			document.getElementById("win").href = game ? game.url : fallback;
+			const button = document.getElementById("launcher-win");
+			button.href = launcher ? launcher.url : document.getElementById("win").href;
+			button.textContent = launcher ? "Download the launcher for Windows" : "Download for Windows";
+			// Until a launcher is published, the big button already is the game zip.
+			document.getElementById("game-only").hidden = !launcher;
+			const version = game ? game.release.tag_name.slice(1) : FALLBACK_VERSION;
 			for (const el of document.querySelectorAll(".version")) el.textContent = version;
 		}
-
 		show([]);
 		fetch(`https://api.github.com/repos/${REPO}/releases?per_page=20`)
 			.then((response) => (response.ok ? response.json() : []))
