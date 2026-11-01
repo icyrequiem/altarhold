@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 
-// Relic Protocol landing page. React + Tailwind CSS (v3), built by `npm run build` into assets/.
+// Altarhold landing page. React + Tailwind CSS (v3), built by `npm run build` into assets/.
 // Fonts: Oswald (display), Inter (body), JetBrains Mono (stats) from Google Fonts.
 
 const DISCORD_URL = null; // Set to the invite link once the server exists; until then the button shows "coming soon".
@@ -152,7 +152,7 @@ function Hero() {
 				<span className="text-cyan-300">Pure spatial brutality.</span>
 			</h1>
 			<p className="mt-8 max-w-2xl text-lg text-slate-300 sm:text-xl">
-				Enter Relic Protocol: a 5v5 tactical arena where minion geometry and spatial control dictate survival.
+				Enter Altarhold: a 5v5 tactical arena where minion geometry and spatial control dictate survival.
 			</p>
 			<div className="mt-10 flex flex-wrap gap-4">
 				<GlassButton href="#alpha">Join the alpha</GlassButton>
@@ -462,7 +462,7 @@ function Devlogs() {
 	);
 }
 
-function RelicProtocolLanding() {
+function AltarholdLanding() {
 	return (
 		<div className="relative min-h-full overflow-hidden bg-[#070a0d] font-body text-slate-200">
 			{/* Structural grid overlay */}
@@ -481,7 +481,7 @@ function RelicProtocolLanding() {
 
 			<div className="relative mx-auto max-w-6xl px-4 sm:px-8">
 				<header className="flex items-center justify-between py-6">
-					<span className="font-display text-xl font-bold uppercase tracking-[0.2em] text-white">Relic Protocol</span>
+					<span className="font-display text-xl font-bold uppercase tracking-[0.2em] text-white">Altarhold</span>
 					<nav className="flex gap-6 font-mono text-xs uppercase tracking-widest text-slate-400">
 						<a href="#alpha" className="hover:text-cyan-200">Alpha</a>
 						<a href="#heroes" className="hover:text-cyan-200">Heroes</a>
@@ -504,4 +504,4 @@ function RelicProtocolLanding() {
 	);
 }
 
-createRoot(document.getElementById("root")).render(<RelicProtocolLanding />);
+createRoot(document.getElementById("root")).render(<AltarholdLanding />);

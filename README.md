@@ -1,6 +1,6 @@
-# Relic Protocol website
+# Altarhold website
 
-Public site and dated devlog for Relic Protocol (first announced as "Project Altar"), a 5v5 MOBA in development by Ynairally.
+Public site and dated devlog for Altarhold (first announced as "Project Altar", later called "Relic Protocol"), a 5v5 MOBA in development by Ynairally.
 Served by GitHub Pages from the `main` branch root.
 
 - `index.html` landing page: a React + Tailwind app built from `site-src/` into `assets/`

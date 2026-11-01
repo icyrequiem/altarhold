@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="robots" content="noindex, nofollow">
-	<title>Alpha download · Relic Protocol</title>
+	<title>Alpha download · Altarhold</title>
 	<link rel="stylesheet" href="../style.css">
 	<style>
 		.download { display: inline-block; padding: 12px 20px; border-radius: 8px; background: var(--accent); color: #0f1218; font-weight: 700; text-decoration: none; margin: 6px 12px 6px 0; }
@@ -14,7 +14,7 @@
 </head>
 <body>
 	<header>
-		<a class="brand" href="../">Relic Protocol</a>
+		<a class="brand" href="../">Altarhold</a>
 		<nav><a href="../">Home</a><a href="../timeline.html">Timeline</a></nav>
 	</header>
 	<main>
@@ -29,7 +29,7 @@
 
 		<h2>Getting started</h2>
 		<ol>
-			<li>Unzip the whole folder, then double-click <strong>RelicProtocol.exe</strong>.</li>
+			<li>Unzip the whole folder, then double-click <strong>Altarhold.exe</strong> (builds up to 0.2.0 call it RelicProtocol.exe).</li>
 			<li>Windows may say "Windows protected your PC" because the alpha isn't code-signed yet. Click <strong>More info</strong>, then <strong>Run anyway</strong>.</li>
 			<li>Press <strong>Play online</strong>. The test server is already filled in: type your name, press Connect, pick a hero and press Ready. Bots fill empty seats.</li>
 			<li>If the game says your version is out of date, come back here for the newest build.</li>
@@ -45,10 +45,17 @@
 		const REPO = "icyrequiem/project-altar";
 		const FALLBACK_VERSION = "0.2.0-alpha";
 
-		function show(version) {
-			const base = `https://github.com/${REPO}/releases/download/v${version}/RelicProtocol-${version}-`;
-			document.getElementById("win").href = base + "windows.zip";
-			document.getElementById("linux").href = base + "linux.zip";
+		// Builds up to 0.2.0-alpha were named RelicProtocol-*; later ones are Altarhold-*.
+		// A release's own asset list wins when GitHub answers.
+		function show(version, assets) {
+			const prefix = FALLBACK_VERSION === version ? "RelicProtocol" : "Altarhold";
+			const base = `https://github.com/${REPO}/releases/download/v${version}/${prefix}-${version}-`;
+			const pick = (suffix) => {
+				const asset = (assets || []).find((a) => a.name.endsWith(suffix));
+				return asset ? asset.browser_download_url : base + suffix;
+			};
+			document.getElementById("win").href = pick("windows.zip");
+			document.getElementById("linux").href = pick("linux.zip");
 			for (const el of document.querySelectorAll(".version")) el.textContent = version;
 		}
 
@@ -57,7 +64,7 @@
 			.then((response) => (response.ok ? response.json() : []))
 			.then((releases) => {
 				const latest = releases.find((r) => !r.draft && /^v\d/.test(r.tag_name));
-				if (latest) show(latest.tag_name.slice(1));
+				if (latest) show(latest.tag_name.slice(1), latest.assets);
 			})
 			.catch(() => {});
 	</script>
