@@ -8,7 +8,7 @@ const DISCORD_URL = null; // Set to the invite link once the server exists; unti
 const DEVLOG_BASE = "devlog/";
 // Alpha download: no sign-up. The Windows button links the newest launcher zip published on the site repo's
 // releases (or the newest game zip until a launcher is published); alpha/download.html has the same button.
-const RELEASES_REPO = "icyrequiem/project-altar";
+const RELEASES_REPO = "icyrequiem/altarhold";
 const FALLBACK_DOWNLOAD = `https://github.com/${RELEASES_REPO}/releases/download/v0.2.0-alpha/RelicProtocol-0.2.0-alpha-windows.zip`;
 
 const PILLARS = [
