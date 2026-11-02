@@ -118,7 +118,7 @@ function Hero() {
 					<img src="img/logo/altarhold-logo.svg" alt="Altarhold" width="440" height="215" className="h-auto w-64 drop-shadow-[0_6px_0_rgba(0,0,0,0.5)] sm:w-96" />
 					<p className="mt-8 font-pixel text-xs uppercase tracking-[0.2em] text-violet-light">5v5 MOBA · Pixel art · Closed alpha</p>
 					<h1 className="mt-3 font-heading text-4xl font-bold uppercase leading-tight text-cream sm:text-6xl [text-wrap:balance]">
-						No shop. No dashes. <span className="text-gold">Hold the altar.</span>
+						No shop. No gold. <span className="text-gold">Hold the altar.</span>
 					</h1>
 					<p className="mt-6 max-w-xl text-lg text-muted sm:text-xl">
 						Grow through levels and relics instead of gold, and win fights on positioning, because nobody can blink out of one.
