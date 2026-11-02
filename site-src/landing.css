@@ -2,7 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-html { background: #070a0d; color-scheme: dark; scroll-behavior: smooth; }
+html { background: #180e12; color-scheme: dark; scroll-behavior: smooth; }
+body { background: #180e12; }
+
+/* Notched pixel corners: the frame and its inner fill are clipped 6px and 4px in. */
+@layer components {
+	.notch { clip-path: polygon(6px 0, calc(100% - 6px) 0, calc(100% - 6px) 3px, calc(100% - 3px) 3px, calc(100% - 3px) 6px, 100% 6px, 100% calc(100% - 6px), calc(100% - 3px) calc(100% - 6px), calc(100% - 3px) calc(100% - 3px), calc(100% - 6px) calc(100% - 3px), calc(100% - 6px) 100%, 6px 100%, 6px calc(100% - 3px), 3px calc(100% - 3px), 3px calc(100% - 6px), 0 calc(100% - 6px), 0 6px, 3px 6px, 3px 3px, 6px 3px); }
+	.notch-inner { clip-path: polygon(3px 0, calc(100% - 3px) 0, 100% 3px, 100% calc(100% - 3px), calc(100% - 3px) 100%, 3px 100%, 0 calc(100% - 3px), 0 3px); }
+	.pixelated { image-rendering: pixelated; }
+}
+
 @media (prefers-reduced-motion: reduce) {
 	html { scroll-behavior: auto; }
 	* { transition: none !important; }
