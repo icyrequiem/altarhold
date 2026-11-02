@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { COUNTRIES } from "./countries.js";
 
 // Altarhold home page. React + Tailwind CSS (v3), built by `npm run build` into assets/.
 // Look: the game's "Bronze Reliquary" HUD palette (src/client/hud_skin.gd in the game repo).
@@ -7,11 +8,17 @@ import { createRoot } from "react-dom/client";
 // Devlogs are listed on devlog/index.html, not here.
 
 const DISCORD_URL = null; // Set to the invite link once the server exists.
-// Windows only, no sign-up. The button links the newest installer (AltarholdSetup-*.exe) on the site repo's releases,
-// else the newest launcher zip, else the newest game zip; alpha/download.html does the same.
-const RELEASES_REPO = "icyrequiem/altarhold";
-const DOWNLOAD_PAGE = "alpha/download.html";
-const FALLBACK_DOWNLOAD = DOWNLOAD_PAGE;
+
+// Registration makes the same account players sign in with in the game (Supabase Auth, the game's project).
+// The publishable key is public by design; the database's row rules decide what it may do (see docs/accounts.md
+// in the game repo). The sign-up metadata feeds the players row (username, country, age check); alpha_request
+// and signup_source stay in auth.users only, for picking closed alpha testers.
+const SUPABASE_URL = "https://aawqagljvcufrcclglwo.supabase.co";
+const SUPABASE_KEY = "sb_publishable_U36MWIT1HASPgpKwyxWsWw_9PilPtUm";
+const CONFIRMED_PAGE = "https://icyrequiem.github.io/altarhold/account/confirmed.html";
+const USERNAME_RE = /^[A-Za-z0-9_]{3,16}$/;
+const MIN_PASSWORD = 8;
+const MIN_AGE = 13;
 
 // Pixel icons: one string per row; each letter is a palette colour, "." is empty.
 const ICON_COLORS = { k: "#180e12", b: "#c49652", l: "#fad68c", d: "#785028", v: "#a070e0", w: "#f0d8ff", c: "#fff0cd", r: "#d0503c", g: "#58be46", s: "#8c8c9a" };
@@ -71,31 +78,7 @@ function SectionTitle({ kicker, title, id, children }) {
 	);
 }
 
-// The newest published Windows installer, else launcher zip, else game zip, from the site repo's releases.
-function useWindowsDownload() {
-	const [download, setDownload] = useState({ url: FALLBACK_DOWNLOAD, version: null });
-	useEffect(() => {
-		const find = (releases, prefix, suffix = "-windows.zip") => {
-			for (const release of releases) {
-				if (release.draft || !/^v\d/.test(release.tag_name)) continue;
-				const asset = (release.assets || []).find((a) => a.name.startsWith(prefix) && a.name.endsWith(suffix) && /\d/.test(a.name.charAt(prefix.length)));
-				if (asset) return { url: asset.browser_download_url, version: release.tag_name.slice(1) };
-			}
-			return null;
-		};
-		fetch(`https://api.github.com/repos/${RELEASES_REPO}/releases?per_page=20`)
-			.then((response) => (response.ok ? response.json() : []))
-			.then((releases) => {
-				if (!Array.isArray(releases)) return;
-				const found = find(releases, "AltarholdSetup-", ".exe") ?? find(releases, "AltarholdLauncher-") ?? find(releases, "Altarhold-");
-				if (found) setDownload(found);
-			})
-			.catch(() => {});
-	}, []);
-	return download;
-}
-
-function Nav({ download }) {
+function Nav() {
 	const links = [
 		["#mechanics", "Mechanics"],
 		["#pixel-art", "Pixel art"],
@@ -117,14 +100,14 @@ function Nav({ download }) {
 							</li>
 						))}
 					</ul>
-					<PixelButton href={download.url} className="[&>span]:px-4 [&>span]:py-2 [&>span]:text-xs">Download</PixelButton>
+					<PixelButton href="#register" className="[&>span]:px-4 [&>span]:py-2 [&>span]:text-xs">Register</PixelButton>
 				</div>
 			</nav>
 		</header>
 	);
 }
 
-function Hero({ download }) {
+function Hero() {
 	return (
 		<section className="relative isolate overflow-hidden border-b-[3px] border-bronze-dark">
 			<img src="img/shots/hero-backdrop.webp" alt="" className="absolute inset-0 -z-20 h-full w-full object-cover" />
@@ -133,7 +116,7 @@ function Hero({ download }) {
 			<div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-[1.2fr_1fr]">
 				<div>
 					<img src="img/logo/altarhold-logo.svg" alt="Altarhold" width="440" height="215" className="h-auto w-64 drop-shadow-[0_6px_0_rgba(0,0,0,0.5)] sm:w-96" />
-					<p className="mt-8 font-pixel text-xs uppercase tracking-[0.2em] text-violet-light">5v5 MOBA · Pixel art · Free alpha</p>
+					<p className="mt-8 font-pixel text-xs uppercase tracking-[0.2em] text-violet-light">5v5 MOBA · Pixel art · Closed alpha</p>
 					<h1 className="mt-3 font-heading text-4xl font-bold uppercase leading-tight text-cream sm:text-6xl [text-wrap:balance]">
 						No shop. No dashes. <span className="text-gold">Hold the altar.</span>
 					</h1>
@@ -141,11 +124,11 @@ function Hero({ download }) {
 						Grow through levels and relics instead of gold, and win fights on positioning, because nobody can blink out of one.
 					</p>
 					<div className="mt-8 flex flex-wrap items-center gap-4">
-						<PixelButton href={download.url}>Download for Windows</PixelButton>
+						<PixelButton href="#register">Register for the alpha</PixelButton>
 						<PixelButton href="#mechanics" tone="ghost">How it plays</PixelButton>
 					</div>
 					<p className="mt-4 font-pixel text-[11px] uppercase tracking-wider text-muted/80">
-						Free · No sign-up{download.version ? ` · Build ${download.version}` : ""}
+						Free · Windows · Closed alpha testing
 					</p>
 				</div>
 				<div className="hidden justify-center lg:flex">
@@ -460,20 +443,151 @@ function Heroes() {
 	);
 }
 
+// The country to preselect, from the browser's language (en-SG -> SG), if it is in the list.
+function guessCountry() {
+	const languages = typeof navigator === "undefined" ? [] : navigator.languages ?? [navigator.language];
+	for (const tag of languages) {
+		const region = (tag || "").split("-")[1]?.toUpperCase();
+		if (region && COUNTRIES.some(([code]) => code === region)) return region;
+	}
+	return "";
+}
+
+async function supabase(path, body) {
+	const response = await fetch(`${SUPABASE_URL}${path}`, {
+		method: "POST",
+		headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
+		body: JSON.stringify(body),
+	});
+	const data = await response.json().catch(() => null);
+	return { ok: response.ok, status: response.status, data };
+}
+
+// Same checks as the game's sign-up form (AccountClient.sign_up_problem).
+function formProblem(form) {
+	if (!form.email.includes("@")) return "Enter your email address.";
+	if (form.password.length < MIN_PASSWORD) return `Use a password of at least ${MIN_PASSWORD} characters.`;
+	if (!USERNAME_RE.test(form.username.trim())) return "Pick a username of 3 to 16 letters, digits or _.";
+	if (!form.country) return "Pick your country.";
+	if (!form.adult) return `You must be ${MIN_AGE} or older to make an account.`;
+	return "";
+}
+
+function friendlyError(answer) {
+	const text = `${answer.data?.msg ?? answer.data?.message ?? answer.data?.error_description ?? ""}`.toLowerCase();
+	if (text.includes("database error")) return "That username is taken.";
+	if (text.includes("already registered") || text.includes("already been registered")) return "That email already has an account. Sign in from the game, or use another email.";
+	if (text.includes("password")) return answer.data?.msg ?? "That password isn't allowed. Try a longer one.";
+	if (answer.status === 429) return "Too many sign-ups just now. Try again in a minute.";
+	return "Something went wrong. Try again in a minute.";
+}
+
+const FIELD = "w-full border-2 border-bronze-dark bg-ink px-3 py-2 text-cream placeholder:text-muted/50 focus:border-gold focus:outline-none";
+const LABEL = "block font-pixel text-[11px] uppercase tracking-wider text-muted";
+
+function RegisterForm() {
+	const [form, setForm] = useState({ email: "", password: "", username: "", country: guessCountry(), adult: false, alpha: true });
+	const [state, setState] = useState({ status: "idle", message: "" });
+	const set = (key) => (e) => setForm({ ...form, [key]: e.target.type === "checkbox" ? e.target.checked : e.target.value });
+
+	const submit = async (e) => {
+		e.preventDefault();
+		const problem = formProblem(form);
+		if (problem) return setState({ status: "error", message: problem });
+		setState({ status: "sending", message: "" });
+		try {
+			const username = form.username.trim();
+			const free = await supabase("/rest/v1/rpc/username_available", { name: username });
+			if (free.ok && free.data === false) return setState({ status: "error", message: "That username is taken." });
+			const answer = await supabase(`/auth/v1/signup?redirect_to=${encodeURIComponent(CONFIRMED_PAGE)}`, {
+				email: form.email.trim(),
+				password: form.password,
+				data: { display_name: username, username, country: form.country, age_confirmed: true, alpha_request: form.alpha, signup_source: "website" },
+			});
+			if (!answer.ok) return setState({ status: "error", message: friendlyError(answer) });
+			setState({ status: "done", message: form.email.trim() });
+		} catch {
+			setState({ status: "error", message: "Couldn't reach the account server. Check your connection and try again." });
+		}
+	};
+
+	if (state.status === "done") {
+		return (
+			<div className="flex flex-col items-center gap-4 p-8 text-center" role="status">
+				<img src="img/anim/orin_ash-cast.webp" alt="" width="192" height="224" className="pixelated h-40 w-auto" />
+				<p className="font-heading text-2xl font-bold uppercase text-gold">Check your email</p>
+				<p className="max-w-sm text-sm text-cream/90">
+					We sent a link to <strong className="text-cream">{state.message}</strong>. Open it to confirm your account.
+					{form.alpha ? " You're on the closed alpha list, and we'll email you when your invite is ready." : ""}
+				</p>
+				<p className="max-w-sm text-xs text-muted">The same account signs you in to the game, keeps your match history and earns your rank.</p>
+			</div>
+		);
+	}
+
+	return (
+		<form onSubmit={submit} noValidate className="grid gap-4 p-6 sm:p-8">
+			<p className="font-heading text-2xl font-bold uppercase text-gold">Create your account</p>
+			<div className="grid gap-4 sm:grid-cols-2">
+				<label className="sm:col-span-2">
+					<span className={LABEL}>Email</span>
+					<input type="email" autoComplete="email" required value={form.email} onChange={set("email")} className={`${FIELD} mt-1`} />
+				</label>
+				<label>
+					<span className={LABEL}>Username</span>
+					<input type="text" autoComplete="username" required minLength={3} maxLength={16} pattern="[A-Za-z0-9_]{3,16}" value={form.username} onChange={set("username")} className={`${FIELD} mt-1`} aria-describedby="username-hint" />
+					<span id="username-hint" className="mt-1 block text-xs text-muted/80">3-16 letters, digits or _. You can't change it later.</span>
+				</label>
+				<label>
+					<span className={LABEL}>Password</span>
+					<input type="password" autoComplete="new-password" required minLength={MIN_PASSWORD} value={form.password} onChange={set("password")} className={`${FIELD} mt-1`} aria-describedby="password-hint" />
+					<span id="password-hint" className="mt-1 block text-xs text-muted/80">At least {MIN_PASSWORD} characters.</span>
+				</label>
+				<label className="sm:col-span-2">
+					<span className={LABEL}>Country</span>
+					<select required value={form.country} onChange={set("country")} className={`${FIELD} mt-1`}>
+						<option value="">Pick your country</option>
+						{COUNTRIES.map(([code, name]) => (
+							<option key={code} value={code}>{name}</option>
+						))}
+					</select>
+				</label>
+			</div>
+			<label className="flex items-start gap-3 text-sm text-cream/90">
+				<input type="checkbox" checked={form.adult} onChange={set("adult")} className="mt-1 h-4 w-4 accent-[#ffdc78]" />
+				<span>I am {MIN_AGE} or older.</span>
+			</label>
+			<label className="flex items-start gap-3 text-sm text-cream/90">
+				<input type="checkbox" checked={form.alpha} onChange={set("alpha")} className="mt-1 h-4 w-4 accent-[#ffdc78]" />
+				<span>Sign me up for the closed alpha. I play on a Windows PC and I'm happy to report bugs.</span>
+			</label>
+			{state.status === "error" && (
+				<p role="alert" className="border-2 border-[#d0503c] bg-[#d0503c]/15 px-3 py-2 text-sm text-cream">{state.message}</p>
+			)}
+			<button type="submit" disabled={state.status === "sending"} className="notch mt-2 justify-self-start bg-ink p-[3px] focus:outline-none focus-visible:ring-2 focus-visible:ring-gold disabled:opacity-60">
+				<span className="notch-inner block bg-gold px-6 py-3 font-pixel text-sm uppercase tracking-wider text-ink shadow-[inset_0_-4px_0_rgba(0,0,0,0.3),inset_0_3px_0_rgba(255,255,255,0.35)] hover:bg-bronze-light">
+					{state.status === "sending" ? "Creating account…" : "Create account"}
+				</span>
+			</button>
+			<p className="text-xs text-muted">We only use your email to sign you in and to send your alpha invite. Your username and country are public on leaderboards.</p>
+		</form>
+	);
+}
+
 const STEPS = [
-	["Download", "Get the installer for Windows. No account or sign-up needed."],
-	["Install", "Run AltarholdSetup.exe. It adds Altarhold to your Desktop and Start menu, and the launcher downloads and updates the game."],
-	["Play", "Press Play online, pick a hero and ready up. Bots fill empty seats, so there's always a match."],
+	["Register", "Create your Altarhold account here. It's the same account you sign in with in the game."],
+	["Confirm", "Open the link we email you to confirm your address."],
+	["Get your invite", "Closed alpha testers are picked in waves. We'll email you the download when it's your turn."],
 ];
 
-function Download({ download }) {
+function Register() {
 	return (
-		<section id="download" aria-labelledby="download-title" className="scroll-mt-20 border-t-[3px] border-bronze-dark bg-[radial-gradient(ellipse_at_50%_0%,#462a5a,transparent_70%)] py-20 sm:py-28">
+		<section id="register" aria-labelledby="register-title" className="scroll-mt-20 border-t-[3px] border-bronze-dark bg-[radial-gradient(ellipse_at_50%_0%,#462a5a,transparent_70%)] py-20 sm:py-28">
 			<div className="mx-auto max-w-6xl px-4 sm:px-6">
-				<div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-center">
+				<div className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-start">
 					<div>
-						<SectionTitle kicker="Play the alpha" title="Help us break it before anyone else does" id="download-title">
-							The alpha is small and rough: bots in empty seats, unfinished heroes and frequent updates. Play online 5v5 on our server and shape the game before it opens up.
+						<SectionTitle kicker="Closed alpha" title="Register to play" id="register-title">
+							The alpha is small and rough: bots in empty seats, unfinished heroes and frequent updates. Register an account to join the closed alpha, play online 5v5 on our server and shape the game before it opens up.
 						</SectionTitle>
 						<ol className="mt-8 grid gap-3">
 							{STEPS.map(([title, body], i) => (
@@ -487,14 +601,8 @@ function Download({ download }) {
 							))}
 						</ol>
 					</div>
-					<Panel tone="wood" inner="flex flex-col items-center gap-5 p-8 text-center">
-						<img src="img/logo/altarhold-emblem.svg" alt="" width="96" height="96" className="h-24 w-24" />
-						<p className="font-heading text-2xl font-bold uppercase text-gold">Altarhold alpha</p>
-						<PixelButton href={download.url}>Download for Windows</PixelButton>
-						<p className="max-w-sm text-xs leading-relaxed text-muted">
-							Free{download.version ? ` · build ${download.version}` : ""}. Needs 64-bit Windows 10 or 11. The alpha isn't code-signed yet, so Windows may say it protected your PC: click More info, then Run anyway.
-						</p>
-						<a href={DOWNLOAD_PAGE} className="font-pixel text-[11px] uppercase tracking-wider text-gold hover:text-bronze-light">Install help and controls →</a>
+					<Panel tone="wood">
+						<RegisterForm />
 					</Panel>
 				</div>
 			</div>
@@ -502,7 +610,7 @@ function Download({ download }) {
 	);
 }
 
-function Footer({ download }) {
+function Footer() {
 	return (
 		<footer className="border-t-[3px] border-bronze-dark bg-ink py-10">
 			<div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
@@ -515,7 +623,7 @@ function Footer({ download }) {
 				<ul className="flex flex-wrap gap-x-6 gap-y-2 font-pixel text-xs uppercase tracking-wider">
 					<li><a href="devlog/" className="text-muted hover:text-gold">Devlog</a></li>
 					<li><a href="timeline.html" className="text-muted hover:text-gold">Timeline</a></li>
-					<li><a href={download.url} className="text-muted hover:text-gold">Download</a></li>
+					<li><a href="#register" className="text-muted hover:text-gold">Register</a></li>
 					{DISCORD_URL && <li><a href={DISCORD_URL} className="text-muted hover:text-gold">Discord</a></li>}
 				</ul>
 			</div>
@@ -524,19 +632,18 @@ function Footer({ download }) {
 }
 
 function App() {
-	const download = useWindowsDownload();
 	return (
 		<div className="min-h-screen bg-ink font-body text-cream antialiased">
 			<a href="#mechanics" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-gold focus:px-4 focus:py-2 focus:text-ink">Skip to content</a>
-			<Nav download={download} />
+			<Nav />
 			<main>
-				<Hero download={download} />
+				<Hero />
 				<Mechanics />
 				<PixelArt />
 				<Heroes />
-				<Download download={download} />
+				<Register />
 			</main>
-			<Footer download={download} />
+			<Footer />
 		</div>
 	);
 }

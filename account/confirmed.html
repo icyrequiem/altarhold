@@ -14,11 +14,11 @@
 <body>
 	<header>
 		<a class="brand" href="../"><img src="../img/logo/altarhold-wordmark.svg" alt="Altarhold" width="190" height="36"></a>
-		<nav><a href="../">Home</a><a href="../devlog/">Devlog</a><a href="../timeline.html">Timeline</a><a href="../alpha/download.html">Download</a></nav>
+		<nav><a href="../">Home</a><a href="../devlog/">Devlog</a><a href="../timeline.html">Timeline</a><a href="../#register">Register</a></nav>
 	</header>
 	<main>
 		<h1 id="title">Email confirmed</h1>
-		<p class="lead" id="message">Your Altarhold account is ready. Go back to the game, open <strong>Play online</strong> and sign in with your email and password.</p>
+		<p class="lead" id="message">Your Altarhold account is ready. If you signed up for the closed alpha, we'll email you when your invite is ready. Already have the game? Open <strong>Play online</strong> and sign in with your email and password.</p>
 		<p id="hint">You can close this page.</p>
 	</main>
 	<script>
@@ -36,8 +36,8 @@
 				document.getElementById("title").textContent = "That link didn't work";
 				var expired = (hash.get("error_code") || "").indexOf("expired") !== -1;
 				document.getElementById("message").textContent = expired
-					? "The link has expired or was already used. If you can sign in to the game, your account is confirmed. Otherwise press Create account again with the same email to get a new link."
-					: "Supabase said: " + error.replace(/\+/g, " ") + ". Try signing in to the game; if that fails, create the account again.";
+					? "The link has expired or was already used. If you can sign in to the game, your account is confirmed. Otherwise register again with the same email to get a new link."
+					: "Supabase said: " + error.replace(/\+/g, " ") + ". Try signing in; if that fails, register again.";
 				document.getElementById("hint").textContent = "";
 			}
 		})();
