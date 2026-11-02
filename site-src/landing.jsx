@@ -80,6 +80,7 @@ function SectionTitle({ kicker, title, id, children }) {
 
 function Nav() {
 	const links = [
+		["#teaser", "Teaser"],
 		["#mechanics", "Mechanics"],
 		["#pixel-art", "Pixel art"],
 		["#heroes", "Heroes"],
@@ -125,7 +126,7 @@ function Hero() {
 					</p>
 					<div className="mt-8 flex flex-wrap items-center gap-4">
 						<PixelButton href="#register">Register for the alpha</PixelButton>
-						<PixelButton href="#mechanics" tone="ghost">How it plays</PixelButton>
+						<PixelButton href="#teaser" tone="ghost">Watch the teaser</PixelButton>
 					</div>
 					<p className="mt-4 font-pixel text-[11px] uppercase tracking-wider text-muted/80">
 						Free · Windows · Closed alpha testing
@@ -137,6 +138,23 @@ function Hero() {
 						<span className="absolute left-4 top-4 font-pixel text-[10px] uppercase tracking-widest text-arena-text">Orin Ash · 8 directions</span>
 					</Panel>
 				</div>
+			</div>
+		</section>
+	);
+}
+
+function Teaser() {
+	return (
+		<section id="teaser" aria-labelledby="teaser-title" className="scroll-mt-20 pt-20 sm:pt-28">
+			<div className="mx-auto max-w-5xl px-4 sm:px-6">
+				<p className="font-pixel text-xs uppercase tracking-[0.2em] text-violet-light">Teaser</p>
+				<h2 id="teaser-title" className="mt-3 font-heading text-3xl font-bold uppercase tracking-wide text-gold sm:text-5xl">See it in motion</h2>
+				<Panel className="mt-8" inner="bg-ink">
+					<video controls playsInline preload="none" poster="video/altarhold-teaser-poster.webp" className="block aspect-video w-full bg-ink">
+						<source src="video/altarhold-teaser.mp4" type="video/mp4" />
+						Your browser can't play this video. <a href="video/altarhold-teaser.mp4" className="text-gold">Download the teaser</a>.
+					</video>
+				</Panel>
 			</div>
 		</section>
 	);
@@ -638,6 +656,7 @@ function App() {
 			<Nav />
 			<main>
 				<Hero />
+				<Teaser />
 				<Mechanics />
 				<PixelArt />
 				<Heroes />
