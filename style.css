@@ -48,7 +48,8 @@ th { color: var(--accent); font-family: Silkscreen, ui-monospace, monospace; fon
 td:first-child { white-space: nowrap; color: var(--muted); }
 code { font-size: 13px; word-break: break-all; color: var(--muted); }
 ol li, ul li { margin: 6px 0; }
-footer { color: var(--muted); font-size: 14px; padding-top: 56px; padding-bottom: 40px; }
+footer { color: var(--muted); font-size: 14px; padding-top: 56px; padding-bottom: 40px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+footer .social { display: flex; gap: 20px; font-family: Silkscreen, ui-monospace, monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
 .duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 24px 0; }
 .duo figure { margin: 0; }
 .duo img, .wide img { background: radial-gradient(ellipse at 50% 50%, #462a5a, var(--panel)); padding: 12px; }

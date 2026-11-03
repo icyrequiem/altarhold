@@ -8,6 +8,10 @@ import { COUNTRIES } from "./countries.js";
 // Devlogs are listed on devlog/index.html, not here.
 
 const DISCORD_URL = null; // Set to the invite link once the server exists.
+const SOCIALS = [
+	{ name: "YouTube", icon: "youtube", href: "https://www.youtube.com/@Altarhold" },
+	{ name: "Facebook", icon: "facebook", href: "https://www.facebook.com/profile.php?id=61596326423029" },
+];
 
 // Registration makes the same account players sign in with in the game (Supabase Auth, the game's project).
 // The publishable key is public by design; the database's row rules decide what it may do (see docs/accounts.md
@@ -21,7 +25,7 @@ const MIN_PASSWORD = 8;
 const MIN_AGE = 13;
 
 // Pixel icons: one string per row; each letter is a palette colour, "." is empty.
-const ICON_COLORS = { k: "#180e12", b: "#c49652", l: "#fad68c", d: "#785028", v: "#a070e0", w: "#f0d8ff", c: "#fff0cd", r: "#d0503c", g: "#58be46", s: "#8c8c9a" };
+const ICON_COLORS = { k: "#180e12", b: "#c49652", l: "#fad68c", d: "#785028", v: "#a070e0", w: "#f0d8ff", c: "#fff0cd", r: "#d0503c", g: "#58be46", s: "#8c8c9a", y: "#ff0033", f: "#1877f2", x: "#ffffff" };
 const ICONS = {
 	relic: ["....kk....", "...kwvk...", "..kwvvvk..", ".kwvvvvvk.", "kwvvvvvvvk", ".kvvvvvdk.", "..kvvvdk..", "...kvdk...", "....kk....", ".........."],
 	coin: ["..kkkkkk..", ".kllllllk.", "kllbbbblrk", "klbbbbbrlk", "klbbbbrblk", "klbbbrbblk", "klbbrbbblk", "klrbbbblk.", ".kllllllk.", "..kkkkkk.."],
@@ -29,6 +33,8 @@ const ICONS = {
 	wall: ["kkkkkkkkkk", "kbbbkbbbbk", "kddkkddddk", "kkkkkkkkkk", "kbbbbkbbbk", "kddddkdddk", "kkkkkkkkkk", "kbbkbbbbbk", "kddkdddddk", "kkkkkkkkkk"],
 	eye: [".........", "..kkkkk..", ".kcccccck", "kcckvkcck", "kcckkkcck", ".kcccccck", "..kkkkk..", "........."],
 	sword: [".......kk", "......kck", ".....kck.", "....kck..", "kk.kck...", ".kkck....", "..kk.....", ".kdkk....", "kdk..k..."],
+	youtube: [".yyyyyyyy.", "yyyyyyyyyy", "yyyyxyyyyy", "yyyyxxyyyy", "yyyyxxxyyy", "yyyyxxyyyy", "yyyyxyyyyy", "yyyyyyyyyy", ".yyyyyyyy."],
+	facebook: [".ffffffff.", "ffffffxxff", "fffffxxfff", "fffffxffff", "fffxxxxxff", "fffffxffff", "fffffxffff", "fffffxffff", "fffffxffff", ".ffffxfff."],
 	paw: ["..kk..kk..", ".kgk..kgk.", ".kgk..kgk.", "..kk..kk..", "...kkkk...", "..kggggk..", ".kggggggk.", ".kggggggk.", "..kkkkkk..", ".........."],
 };
 
@@ -78,6 +84,22 @@ function SectionTitle({ kicker, title, id, children }) {
 	);
 }
 
+// Pixel icon links to our YouTube channel and Facebook page.
+function SocialLinks({ size = 24, labels = false, className = "" }) {
+	return (
+		<ul className={`flex items-center gap-3 ${className}`}>
+			{SOCIALS.map(({ name, icon, href }) => (
+				<li key={name}>
+					<a href={href} target="_blank" rel="noopener" aria-label={`Altarhold on ${name}`} title={`Altarhold on ${name}`} className="flex items-center gap-2 font-pixel text-xs uppercase tracking-wider text-muted transition hover:text-gold [&>svg]:hover:brightness-125 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold">
+						<PixelIcon name={icon} size={size} />
+						{labels && <span>{name}</span>}
+					</a>
+				</li>
+			))}
+		</ul>
+	);
+}
+
 function Nav() {
 	const links = [
 		["#teaser", "Teaser"],
@@ -101,6 +123,7 @@ function Nav() {
 							</li>
 						))}
 					</ul>
+					<SocialLinks size={22} className="hidden sm:flex" />
 					<PixelButton href="#register" className="[&>span]:px-4 [&>span]:py-2 [&>span]:text-xs">Register</PixelButton>
 				</div>
 			</nav>
@@ -131,6 +154,10 @@ function Hero() {
 					<p className="mt-4 font-pixel text-[11px] uppercase tracking-wider text-muted/80">
 						Free · Windows · Closed alpha testing
 					</p>
+					<div className="mt-6 flex flex-wrap items-center gap-4">
+						<span className="font-pixel text-[11px] uppercase tracking-wider text-violet-light">Follow</span>
+						<SocialLinks size={26} labels className="gap-5" />
+					</div>
 				</div>
 				<div className="hidden justify-center lg:flex">
 					<Panel tone="arena" className="w-[22rem]" inner="relative flex aspect-square items-end justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_70%,#8c64aa66,transparent_60%)]">
@@ -644,6 +671,7 @@ function Footer() {
 					<li><a href="#register" className="text-muted hover:text-gold">Register</a></li>
 					{DISCORD_URL && <li><a href={DISCORD_URL} className="text-muted hover:text-gold">Discord</a></li>}
 				</ul>
+				<SocialLinks size={28} />
 			</div>
 		</footer>
 	);
