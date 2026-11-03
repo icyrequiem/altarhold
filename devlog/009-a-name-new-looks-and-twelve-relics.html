@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/svg+xml" href="../img/logo/altarhold-emblem.svg">
+	<title>Devlog #9: A name, new looks and twelve relics · Altarhold</title>
+	<meta name="description" content="The game is now Altarhold: a new logo, eight heroes rebuilt in 3D and baked to pixel art, six new relics, player accounts with skill ratings, a launcher, and fairer collisions.">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;600&family=Silkscreen&display=swap">
+	<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+	<header>
+		<a class="brand" href="../"><img src="../img/logo/altarhold-wordmark.svg" alt="Altarhold" width="190" height="36"></a>
+		<nav><a href="../">Home</a><a href="../devlog/" aria-current="page">Devlog</a><a href="../timeline.html">Timeline</a><a href="../#register">Register</a></nav>
+	</header>
+	<main>
+		<h1>Devlog #9: A name, new looks and twelve relics</h1>
+		<div class="meta">3 November 2026 · Ynairally</div>
+
+		<p>Three busy days. The game has its real name, eight heroes were rebuilt from scratch, the relic pool doubled, and there is now an account, a launcher and an installer between you and a match.</p>
+
+		<h2>It's called Altarhold</h2>
+		<p>The working titles are gone. The game is <strong>Altarhold</strong>, after the relic arenas at the heart of every match. "Project Altar" stays as the name of the arena itself. The new logo is a bronze shield holding an altar with a floating violet relic, cut in the same bronze and wood as the HUD. It's on the main menu, the window, the launcher and the app icon.</p>
+
+		<h2>Eight heroes rebuilt</h2>
+		<figure class="wide">
+			<img src="../img/pixel-roster-devlog9.webp" alt="Ten pixel-art heroes in a row, including an armoured knight with a shield, a horned berserker, a hooded archer, a fire mage, a sea sage with a glowing staff and a pale frost mage">
+			<figcaption>The roster today. Eight heroes now come from 3D models; Juno and Sela, on the right, are next.</figcaption>
+		</figure>
+		<p>Heroes are now modelled and animated in 3D, then baked into pixel-art sprites in all eight directions. That keeps every frame consistent and makes new animations cheap, so each hero now has a separate cast animation for every skill instead of one shared cast. Their skill effects were redrawn as pixel art to match: fire, stone, frost, water and arrows that look like they belong in the same world as the sprites.</p>
+		<p>Bastion Grael, Orin Ash, Kira Vex, Haldor Quakeborn, Lyra Thorn, Rhea Ironfang, Maro Tidecaller and Nyra Frostweave are done.</p>
+
+		<h2>Six new relics</h2>
+		<figure>
+			<img src="../img/relic-icons.webp" alt="Twelve pixel-art relic icons: a cracked ember heart, a bark shield, a giant's horn, a wolf fang, a winged eye, an axe, a feather, a quicksilver drop, a ringed arcane orb, a rune stone, a starry potion phial and a seashell">
+			<figcaption>All twelve relics, each with its own icon.</figcaption>
+		</figure>
+		<p>The arena prize pool doubled. The six new relics are Giant's Horn, Wolf Fang, Gale Feather, Quicksilver Drop, Starwell Phial and Tidal Shell, adding more health, damage, speed, mana and regeneration to fight over. Each of the twelve has its own painted icon, shown floating over the open arena, in your HUD's relic sockets and on the ground when one is dropped.</p>
+
+		<h2>Accounts and ratings</h2>
+		<p>You now sign in with an Altarhold account, which you can also <a href="../#register">create on the website</a>. Your account keeps your match history and a skill rating that moves after every online match, so later we can match you with players near your level.</p>
+
+		<h2>A launcher and an installer</h2>
+		<p>Alpha testers now get a Windows installer with desktop and Start menu shortcuts. It installs a launcher that downloads the game, keeps it up to date and shows the patch notes for each new build, so nobody has to download zips by hand again.</p>
+
+		<h2>Smaller things</h2>
+		<ul>
+			<li>Collisions work like they should: heroes and minions block each other, but nobody shoves anybody out of the way.</li>
+			<li>Experience from a kill floats up over the body, so you can see what each kill was worth.</li>
+			<li>Richer combat and event sounds, plus new announcer calls.</li>
+			<li>Hero select now fits any window size.</li>
+		</ul>
+
+		<h2>Next</h2>
+		<p>Rebuilding Juno and Sela, and matchmaking, so finding a game is one button.</p>
+
+		<div class="card">
+			<h3>Proof of date</h3>
+			<p class="meta">This hash commits to the private source at this milestone without revealing it. Details are in <a href="../proofs/milestone-009.txt">milestone-009.txt</a>.</p>
+			<code>git commit 04995053663524c8f649d78c78bedf5f91fb2bbd</code>
+		</div>
+	</main>
+	<footer>&copy; 2026 Ynairally. <span class="social"><a href="https://www.youtube.com/@Altarhold" target="_blank" rel="noopener">YouTube</a><a href="https://www.facebook.com/profile.php?id=61596326423029" target="_blank" rel="noopener">Facebook</a></span></footer>
+</body>
+</html>
