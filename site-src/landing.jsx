@@ -19,7 +19,7 @@ const SOCIALS = [
 // and signup_source stay in auth.users only, for picking closed alpha testers.
 const SUPABASE_URL = "https://aawqagljvcufrcclglwo.supabase.co";
 const SUPABASE_KEY = "sb_publishable_U36MWIT1HASPgpKwyxWsWw_9PilPtUm";
-const CONFIRMED_PAGE = "https://icyrequiem.github.io/altarhold/account/confirmed.html";
+const CONFIRMED_PAGE = "https://altarhold.com/account/confirmed.html";
 const USERNAME_RE = /^[A-Za-z0-9_]{3,16}$/;
 const MIN_PASSWORD = 8;
 const MIN_AGE = 13;
