@@ -24,6 +24,18 @@ const USERNAME_RE = /^[A-Za-z0-9_]{3,16}$/;
 const MIN_PASSWORD = 8;
 const MIN_AGE = 13;
 
+// Whole years between a YYYY-MM-DD birthday and today, or NaN if it isn't a real date.
+function ageOn(birthday, today = new Date()) {
+	const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(birthday || "");
+	if (!m) return NaN;
+	const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
+	const born = new Date(y, mo - 1, d);
+	if (born.getFullYear() !== y || born.getMonth() !== mo - 1 || born.getDate() !== d) return NaN;
+	let age = today.getFullYear() - y;
+	if (today.getMonth() < mo - 1 || (today.getMonth() === mo - 1 && today.getDate() < d)) age -= 1;
+	return age;
+}
+
 // Pixel icons: one string per row; each letter is a palette colour, "." is empty.
 const ICON_COLORS = { k: "#180e12", b: "#c49652", l: "#fad68c", d: "#785028", v: "#a070e0", w: "#f0d8ff", c: "#fff0cd", r: "#d0503c", g: "#58be46", s: "#8c8c9a", y: "#ff0033", f: "#1877f2", x: "#ffffff" };
 const ICONS = {
@@ -514,7 +526,10 @@ function formProblem(form) {
 	if (form.password.length < MIN_PASSWORD) return `Use a password of at least ${MIN_PASSWORD} characters.`;
 	if (!USERNAME_RE.test(form.username.trim())) return "Pick a username of 3 to 16 letters, digits or _.";
 	if (!form.country) return "Pick your country.";
-	if (!form.adult) return `You must be ${MIN_AGE} or older to make an account.`;
+	const age = ageOn(form.birthday);
+	if (Number.isNaN(age) || age > 120) return "Enter your birthday.";
+	if (age < 0) return "Your birthday can't be in the future.";
+	if (age < MIN_AGE) return `You must be ${MIN_AGE} or older to make an account.`;
 	return "";
 }
 
@@ -531,7 +546,7 @@ const FIELD = "w-full border-2 border-bronze-dark bg-ink px-3 py-2 text-cream pl
 const LABEL = "block font-pixel text-[11px] uppercase tracking-wider text-muted";
 
 function RegisterForm() {
-	const [form, setForm] = useState({ email: "", password: "", username: "", country: guessCountry(), adult: false, alpha: true });
+	const [form, setForm] = useState({ email: "", password: "", username: "", country: guessCountry(), birthday: "", alpha: true });
 	const [state, setState] = useState({ status: "idle", message: "" });
 	const set = (key) => (e) => setForm({ ...form, [key]: e.target.type === "checkbox" ? e.target.checked : e.target.value });
 
@@ -547,7 +562,7 @@ function RegisterForm() {
 			const answer = await supabase(`/auth/v1/signup?redirect_to=${encodeURIComponent(CONFIRMED_PAGE)}`, {
 				email: form.email.trim(),
 				password: form.password,
-				data: { display_name: username, username, country: form.country, age_confirmed: true, alpha_request: form.alpha, signup_source: "website" },
+				data: { display_name: username, username, country: form.country, age_confirmed: true, birthday: form.birthday, alpha_request: form.alpha, signup_source: "website" },
 			});
 			if (!answer.ok) return setState({ status: "error", message: friendlyError(answer) });
 			setState({ status: "done", message: form.email.trim() });
@@ -588,7 +603,12 @@ function RegisterForm() {
 					<input type="password" autoComplete="new-password" required minLength={MIN_PASSWORD} value={form.password} onChange={set("password")} className={`${FIELD} mt-1`} aria-describedby="password-hint" />
 					<span id="password-hint" className="mt-1 block text-xs text-muted/80">At least {MIN_PASSWORD} characters.</span>
 				</label>
-				<label className="sm:col-span-2">
+				<label>
+					<span className={LABEL}>Birthday</span>
+					<input type="date" autoComplete="bday" required min="1900-01-01" max={new Date().toISOString().slice(0, 10)} value={form.birthday} onChange={set("birthday")} className={`${FIELD} mt-1 [color-scheme:dark]`} aria-describedby="birthday-hint" />
+					<span id="birthday-hint" className="mt-1 block text-xs text-muted/80">You must be {MIN_AGE} or older. Kept private.</span>
+				</label>
+				<label>
 					<span className={LABEL}>Country</span>
 					<select required value={form.country} onChange={set("country")} className={`${FIELD} mt-1`}>
 						<option value="">Pick your country</option>
@@ -598,10 +618,6 @@ function RegisterForm() {
 					</select>
 				</label>
 			</div>
-			<label className="flex items-start gap-3 text-sm text-cream/90">
-				<input type="checkbox" checked={form.adult} onChange={set("adult")} className="mt-1 h-4 w-4 accent-[#ffdc78]" />
-				<span>I am {MIN_AGE} or older.</span>
-			</label>
 			<label className="flex items-start gap-3 text-sm text-cream/90">
 				<input type="checkbox" checked={form.alpha} onChange={set("alpha")} className="mt-1 h-4 w-4 accent-[#ffdc78]" />
 				<span>Sign me up for the closed alpha. I play on a Windows PC and I'm happy to report bugs.</span>
@@ -614,7 +630,7 @@ function RegisterForm() {
 					{state.status === "sending" ? "Creating account…" : "Create account"}
 				</span>
 			</button>
-			<p className="text-xs text-muted">We only use your email to sign you in and to send your alpha invite. Your username and country are public on leaderboards.</p>
+			<p className="text-xs text-muted">We only use your email to sign you in and to send your alpha invite. Your birthday stays private. Your username and country are public on leaderboards.</p>
 		</form>
 	);
 }
@@ -632,7 +648,7 @@ function Register() {
 				<div className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-start">
 					<div>
 						<SectionTitle kicker="Closed alpha" title="Register to play" id="register-title">
-							The alpha is small and rough: bots in empty seats, unfinished heroes and frequent updates. Register an account to join the closed alpha, play online 5v5 on our server and shape the game before it opens up.
+							The alpha is small and rough: unfinished heroes, rough edges and frequent updates. Register an account to join the closed alpha, play online 5v5 on our server and shape the game before it opens up.
 						</SectionTitle>
 						<ol className="mt-8 grid gap-3">
 							{STEPS.map(([title, body], i) => (
