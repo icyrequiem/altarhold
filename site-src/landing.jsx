@@ -7,8 +7,9 @@ import { COUNTRIES } from "./countries.js";
 // Fonts: Cinzel (headings, matches the logo), Silkscreen (pixel labels), Inter (body), from Google Fonts.
 // Devlogs are listed on devlog/index.html, not here.
 
-const DISCORD_URL = null; // Set to the invite link once the server exists.
+const DISCORD_URL = "https://discord.gg/JeTF9JJct";
 const SOCIALS = [
+	...(DISCORD_URL ? [{ name: "Discord", icon: "discord", href: DISCORD_URL }] : []),
 	{ name: "YouTube", icon: "youtube", href: "https://www.youtube.com/@Altarhold" },
 	{ name: "Facebook", icon: "facebook", href: "https://www.facebook.com/profile.php?id=61596326423029" },
 ];
@@ -37,7 +38,7 @@ function ageOn(birthday, today = new Date()) {
 }
 
 // Pixel icons: one string per row; each letter is a palette colour, "." is empty.
-const ICON_COLORS = { k: "#180e12", b: "#c49652", l: "#fad68c", d: "#785028", v: "#a070e0", w: "#f0d8ff", c: "#fff0cd", r: "#d0503c", g: "#58be46", s: "#8c8c9a", y: "#ff0033", f: "#1877f2", x: "#ffffff" };
+const ICON_COLORS = { k: "#180e12", b: "#c49652", l: "#fad68c", d: "#785028", v: "#a070e0", w: "#f0d8ff", c: "#fff0cd", r: "#d0503c", g: "#58be46", s: "#8c8c9a", y: "#ff0033", f: "#1877f2", x: "#ffffff", p: "#5865f2" };
 const ICONS = {
 	relic: ["....kk....", "...kwvk...", "..kwvvvk..", ".kwvvvvvk.", "kwvvvvvvvk", ".kvvvvvdk.", "..kvvvdk..", "...kvdk...", "....kk....", ".........."],
 	coin: ["..kkkkkk..", ".kllllllk.", "kllbbbblrk", "klbbbbbrlk", "klbbbbrblk", "klbbbrbblk", "klbbrbbblk", "klrbbbblk.", ".kllllllk.", "..kkkkkk.."],
@@ -47,6 +48,7 @@ const ICONS = {
 	sword: [".......kk", "......kck", ".....kck.", "....kck..", "kk.kck...", ".kkck....", "..kk.....", ".kdkk....", "kdk..k..."],
 	youtube: [".yyyyyyyy.", "yyyyyyyyyy", "yyyyxyyyyy", "yyyyxxyyyy", "yyyyxxxyyy", "yyyyxxyyyy", "yyyyxyyyyy", "yyyyyyyyyy", ".yyyyyyyy."],
 	facebook: [".ffffffff.", "ffffffxxff", "fffffxxfff", "fffffxffff", "fffxxxxxff", "fffffxffff", "fffffxffff", "fffffxffff", "fffffxffff", ".ffffxfff."],
+	discord: [".pp....pp.", "pppppppppp", "pppppppppp", "ppxxppxxpp", "ppxxppxxpp", "pppppppppp", "ppxppppxpp", "pppxxxxppp", ".pp....pp.", ".........."],
 	paw: ["..kk..kk..", ".kgk..kgk.", ".kgk..kgk.", "..kk..kk..", "...kkkk...", "..kggggk..", ".kggggggk.", ".kggggggk.", "..kkkkkk..", ".........."],
 };
 
@@ -162,6 +164,7 @@ function Hero() {
 					<div className="mt-8 flex flex-wrap items-center gap-4">
 						<PixelButton href="#register">Register for the alpha</PixelButton>
 						<PixelButton href="#teaser" tone="ghost">Watch the teaser</PixelButton>
+						{DISCORD_URL && <PixelButton href={DISCORD_URL} tone="ghost">Join our Discord</PixelButton>}
 					</div>
 					<p className="mt-4 font-pixel text-[11px] uppercase tracking-wider text-muted/80">
 						Free · Windows · Closed alpha testing
@@ -693,7 +696,6 @@ function Footer() {
 					<li><a href="devlog/" className="text-muted hover:text-gold">Devlog</a></li>
 					<li><a href="timeline.html" className="text-muted hover:text-gold">Timeline</a></li>
 					<li><a href="#register" className="text-muted hover:text-gold">Register</a></li>
-					{DISCORD_URL && <li><a href={DISCORD_URL} className="text-muted hover:text-gold">Discord</a></li>}
 				</ul>
 				<SocialLinks size={28} />
 			</div>
