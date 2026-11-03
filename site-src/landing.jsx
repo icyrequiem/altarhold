@@ -538,7 +538,10 @@ function friendlyError(answer) {
 	if (text.includes("database error")) return "That username is taken.";
 	if (text.includes("already registered") || text.includes("already been registered")) return "That email already has an account. Sign in from the game, or use another email.";
 	if (text.includes("password")) return answer.data?.msg ?? "That password isn't allowed. Try a longer one.";
-	if (answer.status === 429) return "Too many sign-ups just now. Try again in a minute.";
+	const code = `${answer.data?.error_code ?? ""}`;
+	if (text.includes("after") && text.includes("seconds")) return "Please wait a minute before trying again with this email.";
+	if (code === "over_email_send_rate_limit" || text.includes("email rate limit")) return "We can't send confirmation emails right now because too many went out in the last hour. Please try again later.";
+	if (code === "over_request_rate_limit" || answer.status === 429) return "Too many tries from your connection. Wait a few minutes and try again.";
 	return "Something went wrong. Try again in a minute.";
 }
 
