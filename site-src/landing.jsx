@@ -249,7 +249,7 @@ function Mechanics() {
 
 				<Panel tone="arena" className="mt-12" inner="grid gap-0 lg:grid-cols-[1.15fr_1fr]">
 					<figure className="relative">
-						<img src="img/shots/relic-arena.webp" alt="A relic arena on a stone dais in the river, ringed by a violet barrier, with heroes fighting inside" width="960" height="540" className="h-full w-full object-cover" loading="lazy" />
+						<img src="img/shots/relic-arena.webp" alt="A relic arena on a stone dais in the river, ringed by a violet barrier, with heroes fighting inside" width="960" height="1080" className="aspect-[4/3] w-full object-cover lg:aspect-auto lg:h-full" loading="lazy" />
 					</figure>
 					<div className="p-6 sm:p-8">
 						<div className="flex items-center gap-4">
@@ -276,6 +276,10 @@ function Mechanics() {
 						<p className="mt-6 border-t-2 border-arena-light/30 pt-4 text-sm text-cream/80">
 							Relics grow stronger with their holder's level and stay with you when you die, but every relic you hold slows the experience you earn. Nobody snowballs for free.
 						</p>
+						<div className="mt-5">
+							<p className="font-pixel text-[11px] uppercase tracking-widest text-arena-text/80">Twelve relics to fight for</p>
+							<img src="img/relic-icons.webp" alt="Twelve pixel-art relic icons, including a cracked ember heart, a winged eye, an axe, a feather, a ringed arcane orb and a starry potion phial" width="1072" height="368" className="pixelated mt-3 w-full max-w-md" loading="lazy" />
+						</div>
 					</div>
 				</Panel>
 
@@ -296,7 +300,7 @@ function Mechanics() {
 }
 
 const SHOTS = [
-	{ src: "img/shots/river-teamfight.webp", caption: "Teamfight in the river", alt: "Ten pixel-art heroes clashing in a river crossing between two lanes" },
+	{ src: "img/shots/river-teamfight.webp", caption: "Trapped at the river", alt: "Heroes caught inside a ring of golden spikes on the riverbank, while others wait in the lane below" },
 	{ src: "img/shots/lane-skirmish.webp", caption: "Lane skirmish under a tower", alt: "Heroes trading spells near a blue tower while minion waves meet in the lane" },
 	{ src: "img/shots/tower-push.webp", caption: "Tower push", alt: "A group of heroes pushing past a ruined tower on a dirt lane" },
 	{ src: "img/shots/turret-fight.webp", caption: "Fight at the outer tower", alt: "Heroes fighting around a tower plinth in the lane, with minions approaching from the forest" },
@@ -304,7 +308,7 @@ const SHOTS = [
 
 const ART_POINTS = [
 	["Eight directions", "Every hero is drawn facing eight ways, with idle, run, attack, cast and death animations."],
-	["A cast for every skill", "Remade heroes get their own animation for each of their four skills, plus pixel-art spell effects."],
+	["A cast for every skill", "Every hero is modelled in 3D and baked to pixel art, with its own animation for each of its four skills and pixel-art spell effects."],
 	["A painted map", "Grass, dirt lanes, the river and the jungle floor are painted in limited palettes with dithering, and the camera moves in whole pixels so nothing shimmers."],
 	["Bronze and wood", "The HUD, hero select and launcher are carved wood and bronze, drawn as chunky pixel art."],
 ];
