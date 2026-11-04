@@ -1,0 +1,11 @@
+Altarhold - milestone 010 (devlog #10)
+Date: 2026-11-04
+
+Private game repository main branch at this milestone:
+  git commit: 1a7d3a9b71ae8f2b84a07bc544526c615003159b
+  committed:  2026-11-04T09:33:22Z
+  SHA-256 of "git archive --format=tar 1a7d3a9b71ae8f2b84a07bc544526c615003159b": a86c7b72287307150c9dfd4e755ff45187bf5c52e596c2f2da71a8b15b7d1897
+
+These hashes reveal nothing about the code, but prove that this exact
+source tree existed no later than this file's first commit to the public
+altarhold repository.

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/svg+xml" href="../img/logo/altarhold-emblem.svg">
+	<title>Devlog #10: Find Match, ranked and ten new faces · Altarhold</title>
+	<meta name="description" content="Matchmaking with one Find Match button, a player dashboard with friends and parties, a ranked ladder, a Blender-made world, and ten new heroes on the way.">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;600&family=Silkscreen&display=swap">
+	<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+	<header>
+		<a class="brand" href="../"><img src="../img/logo/altarhold-wordmark.svg" alt="Altarhold" width="190" height="36"></a>
+		<nav><a href="../">Home</a><a href="../devlog/" aria-current="page">Devlog</a><a href="../timeline.html">Timeline</a><a href="../#register">Register</a></nav>
+	</header>
+	<main>
+		<h1>Devlog #10: Find Match, ranked and ten new faces</h1>
+		<div class="meta">4 November 2026 · Ynairally</div>
+
+		<p>Two days of work, three alpha builds. Altarhold now plays like a real online game: you sign in, press one button and get a match. Then you climb a ladder. The world around the heroes was rebuilt too, and ten more heroes are on the way.</p>
+
+		<h2>One button to play</h2>
+		<p>The old lobby is gone. You sign in with your username and land on your player dashboard, and <strong>Find Match</strong> puts you in a game with players near your skill level. From there it goes straight into hero select. Everyone needs an account now, so every match counts toward your history and rating.</p>
+		<p>The dashboard works like the ones in the big MOBAs. Your profile, party and Find Match sit on the left, with the newest devlog posts and your match history in the middle. Your friends list is on the right. Add friends by username, invite them to your party, and the party queues together when its leader presses the button.</p>
+
+		<h2>A ranked ladder</h2>
+		<p>Matchmaking now has two queues. Unranked is for practice and trying new heroes. Ranked opens after a few games and puts you on a ladder that climbs from <strong>Wanderer</strong> to <strong>Relic Lord</strong>, with divisions in each tier. Wins earn ranked points and losses cost them, and the amount shifts a little when you beat a stronger team. Your first ranked games are placements, and the ladder resets softly each season. Leaving a ranked game early costs you.</p>
+
+		<h2>A world made in 3D</h2>
+		<figure>
+			<img src="../img/shots/devlog10-lane.webp" alt="A lane in the new look: Blender-made towers, minions and trees on a detailed dirt and flagstone ground, with heroes fighting">
+			<figcaption>The new world: minions, creeps, towers and trees are all baked from 3D models now.</figcaption>
+		</figure>
+		<p>After the heroes, the rest of the map got the same treatment. Minions, every jungle creep, towers, cores, fountains, the altar, trees, rocks, ruins and lanterns are all modelled in Blender and baked into pixel art. The ground is richer too: flagstone plazas at the bases, a rune-ringed arena floor, wheel ruts in the lanes, grass tufts and lily pads in the river.</p>
+		<p>Scenery never hides anyone. When a hero, minion or creep walks behind a tree or a tower, you still see them through it.</p>
+		<p>Juno Galecaller and Sela Dawnsong were rebuilt too, so all ten heroes are now baked from 3D models, each with its own cast animation for every skill.</p>
+
+		<h2>Ten new heroes on the way</h2>
+		<figure class="wide">
+			<img src="../img/pixel-roster-new-heroes.webp" alt="Ten new pixel-art heroes in a row, including a monk with a bell hammer, a horned brute, a dancer with twin moon blades, a spear captain, a crow-masked rogue, a witch, a stone giant, a swamp sage in a wide hat, a potter and a dwarf smith">
+			<figcaption>The next ten: modelled and animated, with their kits still in the works.</figcaption>
+		</figure>
+		<p>Gorran Bellwarden, Varga Thornhide, Sefa Twinmoon, Ilka Spearwind, Corvin Ashfeather, Morwen Hexthread, Bramm Stonesling, Fen Mirelight, Odalys Kilnwright and Tobren Anvilheart are modelled and animated from all eight directions, with a cast for each skill. Their abilities come next. To make room for them, hero select now groups heroes into Strength, Agility and Intelligence columns and has a search box, so a much bigger roster fits on one screen.</p>
+
+		<h2>Clearer and fairer matches</h2>
+		<ul>
+			<li>You always see your own team in blue and the enemy in red, whichever side you play on.</li>
+			<li>Level-ups, unspent skill and attribute points, and every relic arena moment are now hard to miss, with banners, pulsing badges, a pillar of light at the pit and an arrow when the arena is off screen.</li>
+			<li>Fountains fight back against enemy heroes who dive the base, and towers can't be walked around the side anymore.</li>
+			<li>Minions stay in their lane instead of chasing heroes across the map.</li>
+			<li>Clicking anywhere on a unit targets it, and Esc opens a game menu instead of leaving the match.</li>
+			<li>The game server now protects itself against floods and misbehaving connections, and busy online matches run with less lag.</li>
+		</ul>
+
+		<h2>Next</h2>
+		<p>Kits for the ten new heroes, and more polish from what alpha testers tell us. Join the conversation on <a href="https://discord.gg/JeTF9JJct">our Discord</a>.</p>
+
+		<div class="card">
+			<h3>Proof of date</h3>
+			<p class="meta">This hash commits to the private source at this milestone without revealing it. Details are in <a href="../proofs/milestone-010.txt">milestone-010.txt</a>.</p>
+			<code>git commit 1a7d3a9b71ae8f2b84a07bc544526c615003159b</code>
+		</div>
+	</main>
+	<footer>&copy; 2026 Ynairally. <span class="social"><a href="https://discord.gg/JeTF9JJct" target="_blank" rel="noopener">Discord</a><a href="https://www.youtube.com/@Altarhold" target="_blank" rel="noopener">YouTube</a><a href="https://www.facebook.com/profile.php?id=61596326423029" target="_blank" rel="noopener">Facebook</a></span></footer>
+</body>
+</html>
