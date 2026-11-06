@@ -239,7 +239,7 @@ const ARENA_STEPS = [
 	["Announced", "A warning goes out before an arena opens in the top or bottom river pit, with how many heroes each team may send."],
 	["Weighted", "The team holding more relics gets fewer places, so a lead is harder to stretch."],
 	["Walled", "A barrier lets in only the heroes with a place, and no attack or ability crosses it."],
-	["Captured", "Hold the majority in the centre to fill the capture; a tie resets it. The arena shatters and the winning team's lowest-level hero takes the relic."],
+	["Captured", "Hold the majority in the centre to fill the capture; a tie resets it. The arena shatters and the winning team's highest-level hero takes the relic."],
 ];
 
 function Mechanics() {
