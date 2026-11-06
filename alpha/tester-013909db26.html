@@ -52,15 +52,29 @@
 		// The launcher keeps its own version number, so its zip may sit in an older release than the game's.
 		// Fallbacks are used if GitHub cannot be reached.
 		const REPO = "icyrequiem/altarhold";
-		const FALLBACK_VERSION = "0.6.0-alpha";
+		const FALLBACK_VERSION = "0.9.0-alpha";
 		const RELEASES = `https://github.com/${REPO}/releases`;
 
-		// The newest asset whose name starts with prefix and ends with suffix.
+		// Compares the numbers in two version strings ("1.0.10" > "1.0.9").
+		function compareVersions(a, b) {
+			const x = a.split(/[.-]/).map((n) => parseInt(n, 10) || 0);
+			const y = b.split(/[.-]/).map((n) => parseInt(n, 10) || 0);
+			for (let i = 0; i < Math.max(x.length, y.length); i++) {
+				if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) - (y[i] || 0);
+			}
+			return 0;
+		}
+
+		// The newest asset whose name starts with prefix and ends with suffix: from the newest
+		// release that has one, and the highest version in it (a new launcher can be added
+		// to a release that already holds an older one).
 		function newest(releases, prefix, suffix) {
 			for (const release of releases) {
 				if (release.draft || !/^v\d/.test(release.tag_name)) continue;
-				const asset = (release.assets || []).find((a) => a.name.startsWith(prefix) && a.name.endsWith(suffix) && /\d/.test(a.name.charAt(prefix.length)));
-				if (asset) return { url: asset.browser_download_url, name: asset.name, release };
+				const version = (a) => a.name.slice(prefix.length, a.name.length - suffix.length);
+				const assets = (release.assets || []).filter((a) => a.name.startsWith(prefix) && a.name.endsWith(suffix) && /\d/.test(a.name.charAt(prefix.length)));
+				assets.sort((a, b) => compareVersions(version(b), version(a)));
+				if (assets.length) return { url: assets[0].browser_download_url, name: assets[0].name, release };
 			}
 			return null;
 		}
