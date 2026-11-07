@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/svg+xml" href="../img/logo/altarhold-emblem.svg">
+	<title>Devlog #12: Twenty heroes and team combos · Altarhold</title>
+	<meta name="description" content="All twenty heroes playable, a team skill combo, reworked attributes, a new relic, and a relic capture you can see on the arena floor.">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;600&family=Silkscreen&display=swap">
+	<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+	<header>
+		<a class="brand" href="../"><img src="../img/logo/altarhold-wordmark.svg" alt="Altarhold" width="190" height="36"></a>
+		<nav><a href="../">Home</a><a href="../devlog/" aria-current="page">Devlog</a><a href="../timeline.html">Timeline</a><a href="../#register">Register</a></nav>
+	</header>
+	<main>
+		<h1>Devlog #12: Twenty heroes and team combos</h1>
+		<div class="meta">7 November 2026 · Ynairally</div>
+
+		<p>Three alpha builds have gone out since the last devlog. The ten heroes who were waiting for their kits are now playable, attributes do more, teams are rewarded for working together, and the relic arenas read better at a glance. Everything here is in alpha 0.11.0.</p>
+
+		<h2>Twenty heroes</h2>
+		<p>Bramm Stonesling, Corvin Ashfeather, Fen Mirelight, Gorran Bellwarden, Ilka Spearwind, Morwen Hexthread, Odalys Kilnwright, Sefa Twinmoon, Tobren Anvilheart and Varga Thornhide all have their full kits now, each skill with its own animation, effect and sound. That doubles the roster to twenty. True to the two rules from the very first devlog, none of them dashes, blinks or turns invisible: a hero who wants to close a gap has to walk it, or make the enemy come to them.</p>
+
+		<h2>Team skill combo</h2>
+		<figure class="wide">
+			<img src="../img/shots/devlog12-combo.webp" alt="A river skirmish: Bastion Grael and Varga Thornhide fighting Tobren Anvilheart and Gorran Bellwarden, with a combo counter glowing over both enemy heroes">
+			<figcaption>Bastion and Varga take turns on the same targets, and a combo counter builds over each enemy.</figcaption>
+		</figure>
+		<p>With no items to build, we wanted teamwork itself to be something you can grow. When two or more allies take turns landing abilities on the same enemy hero, each hit after the first does a little more damage, and the chain keeps climbing to a cap. Hitting twice in a row yourself doesn't add to it, and the chain breaks if nobody lands a hit for a moment. Basic attacks and passives don't count. A counter over the target shows the chain building, so you can see when it is worth following up.</p>
+
+		<h2>Attributes that matter more</h2>
+		<p>The three attributes were reworked. Intelligence now gives ability power, a boost to every ability's damage, heals and shields, whatever the hero, along with mana regen and magic resist. Strength adds strong health regen on top of health and armour. Agility now shortens ability cooldowns as well as speeding up attacks and movement. Spending a level-up point is a real choice now, even for heroes outside their main attribute.</p>
+
+		<h2>Relics and the arena</h2>
+		<figure>
+			<img src="../img/shots/devlog12-capture.webp" alt="A stone relic arena ringed by standing stones beside the river, with three heroes inside and the capture zone filling with blue light around the central altar">
+			<figcaption>A capture in progress: the zone fills in your team's colour.</figcaption>
+		</figure>
+		<p>A captured relic now goes to the winning team's strongest hero, and flies across the arena to them when the altar shatters. Each relic held still slows that hero's levelling, so the rich don't simply get richer. A new relic, Swiftsand Glass, joins the pool for agility heroes and shortens their cooldowns.</p>
+		<p>The capture bar is gone too. The capture zone itself now fills from the altar outward in the capturing team's colour, so you read the fight and the capture in one place. An enemy capture only shows while your team can see the zone.</p>
+
+		<h2>Lanes, towers and Bastion</h2>
+		<figure class="wide">
+			<img src="../img/shots/devlog12-bastion.webp" alt="Two moments of Bastion Grael beside Lyra Thorn on a lane: a silver shield-bash arc, and a pale ring as he raises his guard">
+			<figcaption>Bastion Grael's new skill effects.</figcaption>
+		</figure>
+		<p>Lanes are wider, and minions are a little softer: heroes brush past them and slip through small gaps in a wave, though a tight wave still blocks. Towers now turn on an enemy hero who attacks one of their heroes in range and stay on them until they leave. Bastion Grael got proper effects for his attack and all four skills.</p>
+		<p>Smaller things: hovering a unit outlines it green or red, a hero behind a tower shows through it, a hero behind trees shows as a silhouette instead of seeming to stand on top of them, and the server now spreads games across every core, so many more matches can run at once.</p>
+
+		<h2>Next</h2>
+		<p>Balancing twenty heroes and more alpha tests. Come and tell us which combo you like best on <a href="https://discord.gg/JeTF9JJct">our Discord</a>.</p>
+
+		<div class="card">
+			<h3>Proof of date</h3>
+			<p class="meta">This hash commits to the private source at this milestone without revealing it. Details are in <a href="../proofs/milestone-012.txt">milestone-012.txt</a>.</p>
+			<code>git commit 785fae06f1c916d58b24c1edfad246be69e15cd1</code>
+		</div>
+	</main>
+	<footer>&copy; 2026 Ynairally. <span class="social"><a href="https://discord.gg/JeTF9JJct" target="_blank" rel="noopener">Discord</a><a href="https://www.youtube.com/@Altarhold" target="_blank" rel="noopener">YouTube</a><a href="https://www.facebook.com/profile.php?id=61596326423029" target="_blank" rel="noopener">Facebook</a></span></footer>
+</body>
+</html>
