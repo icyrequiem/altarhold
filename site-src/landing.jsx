@@ -375,7 +375,7 @@ function PixelArt() {
 
 				<Panel className="mt-10" inner="flex flex-col items-center gap-4 p-6 sm:flex-row sm:justify-between">
 					<div className="flex items-end justify-center gap-1 overflow-hidden sm:gap-3">
-						{ROSTER.slice(0, 10).map((h) => (
+						{ROSTER.filter((_, i) => i % 2 === 0).map((h) => (
 							<img key={h.id} src={`img/anim/${h.id}-idle.webp`} alt="" width="96" height="112" className="pixelated h-16 w-auto sm:h-24" loading="lazy" />
 						))}
 					</div>
@@ -387,18 +387,30 @@ function PixelArt() {
 	);
 }
 
-// Starting attribute points from the game's hero data (data/heroes/*.tres, starting_str/agi/int).
+// Starting attribute points from the game's hero data (data/heroes/*.tres, starting_str/agi/int),
+// grouped by role. `frame` is the animation size in sprite pixels where it is not 96x112
+// (heroes whose long weapons need wider sheets).
 const ROSTER = [
 	{ id: "bastion_grael", name: "Bastion Grael", role: "Tank", primary: "STR", attributes: { STR: 5, AGI: 2, INT: 3 }, passive: "Stoneskin", kit: ["Shield Bash", "Bulwark", "Taunt Slam", "Fortress"] },
 	{ id: "haldor_quakeborn", name: "Haldor Quakeborn", role: "Tank", primary: "STR", attributes: { STR: 5, AGI: 3, INT: 2 }, passive: "Aftershock", kit: ["Fault Line", "Stone Stride", "Seismic Grip", "Mountain's Fall"] },
+	{ id: "gorran_bellwarden", name: "Gorran Bellwarden", role: "Tank", primary: "STR", attributes: { STR: 5, AGI: 2, INT: 3 }, passive: "Deep Toll", kit: ["Toll", "Bell Ward", "Chain of Vows", "Great Bell"] },
 	{ id: "rhea_ironfang", name: "Rhea Ironfang", role: "Fighter", primary: "STR", attributes: { STR: 5, AGI: 4, INT: 1 }, passive: "Bloodlust", kit: ["Rend", "Roar", "Ground Slam", "Primal Form"] },
+	{ id: "varga_thornhide", name: "Varga Thornhide", role: "Fighter", primary: "STR", attributes: { STR: 5, AGI: 3, INT: 2 }, passive: "Bramblehide", kit: ["Gore", "Dig In", "Trample", "Hog Wild"], frame: [128, 144] },
+	{ id: "ilka_spearwind", name: "Ilka Spearwind", role: "Fighter", primary: "AGI", attributes: { STR: 3, AGI: 5, INT: 2 }, passive: "Reach", kit: ["Impale", "Set the Pike", "Sweep", "Hundred Thrusts"], frame: [128, 144] },
+	{ id: "sefa_twinmoon", name: "Sefa Twinmoon", role: "Fighter", primary: "AGI", attributes: { STR: 3, AGI: 5, INT: 2 }, passive: "Moon Rhythm", kit: ["Waxing Throw", "Eclipse Spin", "Crescent Pin", "Full Moon"] },
 	{ id: "kira_vex", name: "Kira Vex", role: "Assassin", primary: "AGI", attributes: { STR: 3, AGI: 5, INT: 2 }, passive: "Backstab", kit: ["Shadow Bind", "Smoke Veil", "Crescent Slash", "Execute"] },
+	{ id: "corvin_ashfeather", name: "Corvin Ashfeather", role: "Assassin", primary: "AGI", attributes: { STR: 2, AGI: 5, INT: 3 }, passive: "Carrion Sense", kit: ["Feather Knives", "Murder of Crows", "Crow's Snare", "Last Rites"] },
+	{ id: "morwen_hexthread", name: "Morwen Hexthread", role: "Assassin", primary: "INT", attributes: { STR: 2, AGI: 3, INT: 5 }, passive: "Stitches", kit: ["Needle Spray", "Poppet", "Marionette", "Cut the Thread"] },
 	{ id: "lyra_thorn", name: "Lyra Thorn", role: "Marksman", primary: "AGI", attributes: { STR: 2, AGI: 5, INT: 3 }, passive: "Hunter's Rhythm", kit: ["Piercing Arrow", "Volley", "Snare Trap", "Hunter's Mark"] },
+	{ id: "fen_mirelight", name: "Fen Mirelight", role: "Marksman", primary: "AGI", attributes: { STR: 2, AGI: 5, INT: 3 }, passive: "Bog Venom", kit: ["Wisp Arrow", "Swamp Gas", "Lantern Toss", "Will-o'-Wisp Hunt"] },
+	{ id: "bramm_stonesling", name: "Bramm Stonesling", role: "Marksman", primary: "STR", attributes: { STR: 5, AGI: 2, INT: 3 }, passive: "Heavy Shot", kit: ["Skipping Stone", "Pebble Hail", "Plant Feet", "Rolling Boulder"] },
 	{ id: "juno_galecaller", name: "Juno Galecaller", role: "Mage", primary: "AGI", attributes: { STR: 2, AGI: 5, INT: 3 }, passive: "Static Charge", kit: ["Arc Bolt", "Tailwind", "Gale Burst", "Eye of the Storm"] },
 	{ id: "orin_ash", name: "Orin Ash", role: "Mage", primary: "INT", attributes: { STR: 2, AGI: 3, INT: 5 }, passive: "Burn", kit: ["Fireball", "Flame Wall", "Scorch", "Meteor"] },
 	{ id: "nyra_frostweave", name: "Nyra Frostweave", role: "Mage", primary: "INT", attributes: { STR: 2, AGI: 3, INT: 5 }, passive: "Frostbite", kit: ["Ice Shard", "Rime Ring", "Cold Snap", "Absolute Zero"] },
+	{ id: "odalys_kilnwright", name: "Odalys Kilnwright", role: "Mage", primary: "INT", attributes: { STR: 2, AGI: 3, INT: 5 }, passive: "Fired Clay", kit: ["Clay Shot", "Shape Golem", "Kiln Blast", "Colossus"] },
 	{ id: "maro_tidecaller", name: "Maro Tidecaller", role: "Support", primary: "INT", attributes: { STR: 3, AGI: 2, INT: 5 }, passive: "Ebb and Flow", kit: ["Tide Orb", "Bubble", "Undertow", "Tsunami"] },
 	{ id: "sela_dawnsong", name: "Sela Dawnsong", role: "Support", primary: "INT", attributes: { STR: 3, AGI: 2, INT: 5 }, passive: "Morning Light", kit: ["Sunlance", "Anthem", "Dazzle", "Sanctuary"] },
+	{ id: "tobren_anvilheart", name: "Tobren Anvilheart", role: "Support", primary: "STR", attributes: { STR: 5, AGI: 2, INT: 3 }, passive: "Bodyguard", kit: ["Temper", "Anvil Drop", "Hot Rivet", "Forge Oath"] },
 ];
 const ATTRIBUTE_MAX = 5;
 const ATTRIBUTE_COLORS = { STR: "bg-[#d0503c]", AGI: "bg-[#58be46]", INT: "bg-[#4678e6]" };
@@ -424,8 +436,10 @@ function AttributeRow({ label, value, primary }) {
 }
 
 function Heroes() {
-	const [selected, setSelected] = useState(ROSTER[6]);
+	const [selected, setSelected] = useState(ROSTER.find((h) => h.id === "orin_ash"));
 	const [move, setMove] = useState("idle");
+	// Every sprite pixel is the same size on screen, so taller frames are drawn taller.
+	const [frameW, frameH] = selected.frame ?? [96, 112];
 	const pick = (hero) => {
 		setSelected(hero);
 		setMove("idle");
@@ -433,14 +447,14 @@ function Heroes() {
 	return (
 		<section id="heroes" aria-labelledby="heroes-title" className="scroll-mt-20 py-20 sm:py-28">
 			<div className="mx-auto max-w-6xl px-4 sm:px-6">
-				<SectionTitle kicker="The roster" title="Ten heroes, no items to hide behind" id="heroes-title">
+				<SectionTitle kicker="The roster" title="Twenty heroes, no items to hide behind" id="heroes-title">
 					Each hero has a primary attribute, a passive and four abilities. They start with a few attribute points weighted toward their primary, and every level adds more for you to spend.
 				</SectionTitle>
 
 				<div className="mt-12 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
-					<Panel tone="arena" inner="relative flex min-h-[22rem] flex-col items-center justify-end overflow-hidden bg-[radial-gradient(circle_at_50%_75%,#8c64aa55,transparent_60%)] p-6">
+					<Panel tone="arena" inner="relative flex min-h-[30rem] flex-col items-center justify-end overflow-hidden bg-[radial-gradient(circle_at_50%_75%,#8c64aa55,transparent_60%)] p-6">
 						<span className="absolute left-4 top-4 font-pixel text-[10px] uppercase tracking-widest text-arena-text/80">{selected.role} · {selected.primary}</span>
-						<img key={`${selected.id}-${move}`} src={`img/anim/${selected.id}-${move}.webp`} alt={`${selected.name}, ${move} animation`} width="192" height="224" className="pixelated h-72 w-auto" />
+						<img key={`${selected.id}-${move}`} src={`img/anim/${selected.id}-${move}.webp`} alt={`${selected.name}, ${move} animation`} width={frameW * 2} height={frameH * 2} style={{ height: `${(18 * frameH) / 112}rem` }} className="pixelated w-auto" />
 						<div className="mt-4 flex gap-2" role="group" aria-label="Animation">
 							{MOVES.map(([id, label]) => (
 								<button
