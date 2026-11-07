@@ -192,7 +192,7 @@ function Teaser() {
 				<p className="font-pixel text-xs uppercase tracking-[0.2em] text-violet-light">Teaser</p>
 				<h2 id="teaser-title" className="mt-3 font-heading text-3xl font-bold uppercase tracking-wide text-gold sm:text-5xl">See it in motion</h2>
 				<Panel className="mt-8" inner="bg-ink">
-					<video controls playsInline preload="none" poster="video/altarhold-teaser-poster.webp" className="block aspect-video w-full bg-ink">
+					<video controls playsInline preload="none" poster="video/altarhold-teaser-poster-v2.webp" className="block aspect-video w-full bg-ink">
 						<source src="video/altarhold-teaser-v2.mp4" type="video/mp4" />
 						Your browser can't play this video. <a href="video/altarhold-teaser-v2.mp4" className="text-gold">Download the teaser</a>.
 					</video>
