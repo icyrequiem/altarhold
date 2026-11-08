@@ -49,6 +49,9 @@ const ICONS = {
 	youtube: [".yyyyyyyy.", "yyyyyyyyyy", "yyyyxyyyyy", "yyyyxxyyyy", "yyyyxxxyyy", "yyyyxxyyyy", "yyyyxyyyyy", "yyyyyyyyyy", ".yyyyyyyy."],
 	facebook: [".ffffffff.", "ffffffxxff", "fffffxxfff", "fffffxffff", "fffxxxxxff", "fffffxffff", "fffffxffff", "fffffxffff", "fffffxffff", ".ffffxfff."],
 	discord: [".pp....pp.", "pppppppppp", "pppppppppp", "ppxxppxxpp", "ppxxppxxpp", "pppppppppp", "ppxppppxpp", "pppxxxxppp", ".pp....pp.", ".........."],
+	cliff: ["..........", "......kkk.", ".....kgggk", "....kggggk", "...kdddddk", "kkkkdbdbdk", "kgggdddddk", "kdbdbdbdbk", "kddddddddk", "kkkkkkkkkk"],
+	combo: ["....kk....", "...kllk...", "kkkkllkkkk", "kllllllllk", ".kllllllk.", "..kllllk..", ".kllkkllk.", ".klk..klk.", "kkk....kkk", ".........."],
+	fountain: ["....kk....", "...kwwk...", "..kw..wk..", "....kk....", "...kvvk...", "kkkkvvkkkk", "kvvvvvvvvk", ".kbbbbbbk.", ".kddddddk.", "..kkkkkk.."],
 	paw: ["..kk..kk..", ".kgk..kgk.", ".kgk..kgk.", "..kk..kk..", "...kkkk...", "..kggggk..", ".kggggggk.", ".kggggggk.", "..kkkkkk..", ".........."],
 };
 
@@ -206,7 +209,7 @@ const MECHANICS = [
 	{
 		icon: "coin",
 		title: "No gold. No shop.",
-		body: "Minions, jungle monsters and enemy heroes give experience, not gold. Every level hands you points to put into Strength, Agility or Intelligence, and points in your hero's primary attribute hit harder with basic attacks. You build your hero, not an inventory.",
+		body: "Minions, jungle monsters and enemy heroes give experience, not gold. Every level hands you points for Strength (health, armor, regeneration), Agility (attack speed, move speed, shorter cooldowns) or Intelligence (mana, magic resist, and ability power that boosts every ability's damage, heals and shields). Points in your hero's primary attribute also hit harder with basic attacks. You build your hero, not an inventory.",
 	},
 	{
 		icon: "feet",
@@ -216,12 +219,22 @@ const MECHANICS = [
 	{
 		icon: "wall",
 		title: "Solid minions",
-		body: "Units don't walk through each other. Block a minion wave, body-block a chase, or get trapped against your own creeps if you play careless.",
+		body: "Minions block heroes. You can slip past the edge of a wave, but a packed wave or a well-placed body still stops a chase, and some heroes raise golems that block just the same.",
+	},
+	{
+		icon: "combo",
+		title: "Team combos",
+		body: "When two or more heroes take turns landing abilities on the same enemy hero, each hit after the first deals 3% more, up to 20%. Keep the chain going or it breaks after a few seconds, so a coordinated team hits harder than five solo players.",
 	},
 	{
 		icon: "eye",
 		title: "Fog of war, no wards",
 		body: "You see what your team's heroes, minions and towers see, and jungle walls block sight. There are no wards to buy, so vision means being there.",
+	},
+	{
+		icon: "cliff",
+		title: "High ground",
+		body: "Each base sits on a raised plateau the lanes climb by ramps. From below you can't see up onto it, and basic attacks fired uphill can miss, so pushing a base takes nerve.",
 	},
 	{
 		icon: "sword",
@@ -231,16 +244,52 @@ const MECHANICS = [
 	{
 		icon: "paw",
 		title: "A jungle for experience",
-		body: "Four jungle quadrants of wolves, raptors, toads, crabs and bigger brutes. Camps give experience only, no buffs, and they leash back home if you drag them away.",
+		body: "Four jungle quadrants of wolves, raptors, toads, rock golems, ember brutes and grove wardens, with crabs in the river. Camps give experience only, no buffs, and they leash back home if you drag them away.",
+	},
+	{
+		icon: "fountain",
+		title: "A fountain that bites",
+		body: "Your fountain heals you, and it shoots any enemy hero who dives in, each shot harder than the last. A dive there is possible, but only for a few seconds.",
 	},
 ];
 
 const ARENA_STEPS = [
-	["Announced", "A warning goes out before an arena opens in the top or bottom river pit, with how many heroes each team may send."],
+	["Announced", "A minute before an arena opens in the top or bottom river pit, both teams learn where it is and how many heroes each may send."],
 	["Weighted", "The team holding more relics gets fewer places, so a lead is harder to stretch."],
-	["Walled", "A barrier lets in only the heroes with a place, and no attack or ability crosses it."],
-	["Captured", "Hold the majority in the centre to fill the capture; a tie resets it. The arena shatters and the winning team's highest-level hero takes the relic."],
+	["Walled", "A barrier lets in only the heroes with a place, and no attack or ability crosses it. The fight inside stays inside."],
+	["Captured", "Outnumber the enemy in the centre circle and it fills with your team's colour; an even count resets it. When it is full the arena shatters and your team's highest-level hero takes the relic."],
 ];
+
+// The relics in the game (data/relics/*.tres): their attribute points and their bonus at level 1.
+// Icons are the game's own (PixelRelics), rendered at 4x into img/relics/.
+const RELICS = [
+	{ id: "ember_heart", name: "Ember Heart", bonus: ["+2 STR", "+8 health regen"] },
+	{ id: "iron_bark", name: "Iron Bark", bonus: ["+2 STR", "+20 armor"] },
+	{ id: "giants_horn", name: "Giant's Horn", bonus: ["+2 STR", "+150 max health"] },
+	{ id: "wolf_fang", name: "Wolf Fang", bonus: ["+2 STR", "+10 attack damage"] },
+	{ id: "hawk_eye", name: "Hawk Eye", bonus: ["+2 AGI", "+10% critical chance"] },
+	{ id: "executioners_edge", name: "Executioner's Edge", bonus: ["+2 AGI", "+40% critical damage"] },
+	{ id: "gale_feather", name: "Gale Feather", bonus: ["+2 AGI", "+5% move speed"] },
+	{ id: "quicksilver_drop", name: "Quicksilver Drop", bonus: ["+2 AGI", "+12% attack speed"] },
+	{ id: "swiftsand_glass", name: "Swiftsand Glass", bonus: ["+2 AGI", "8% shorter cooldowns"] },
+	{ id: "arcane_core", name: "Arcane Core", bonus: ["+2 INT", "+8% ability power"] },
+	{ id: "warding_stone", name: "Warding Stone", bonus: ["+2 INT", "+20 magic resist"] },
+	{ id: "starwell_phial", name: "Starwell Phial", bonus: ["+2 INT", "+150 max mana"] },
+	{ id: "tidal_shell", name: "Tidal Shell", bonus: ["+2 INT", "+5 mana regen"] },
+];
+
+// A hover (or focus, or tap) tip above its trigger, or above the nearest positioned parent when
+// `anchored` is false (for small triggers near a screen edge). `children` is the trigger.
+function Tip({ tip, label, className = "", anchored = true, children }) {
+	return (
+		<span tabIndex={0} aria-label={label} className={`group ${anchored ? "relative" : ""} focus:outline-none focus-visible:ring-2 focus-visible:ring-gold ${className}`}>
+			{children}
+			<span role="tooltip" className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 hidden w-72 max-w-[80vw] -translate-x-1/2 border-2 border-bronze bg-ink p-3 text-left text-sm shadow-[0_6px_0_rgba(0,0,0,0.45)] group-hover:block group-focus:block">
+				{tip}
+			</span>
+		</span>
+	);
+}
 
 function Mechanics() {
 	return (
@@ -252,7 +301,7 @@ function Mechanics() {
 
 				<Panel tone="arena" className="mt-12" inner="grid gap-0 lg:grid-cols-[1.15fr_1fr]">
 					<figure className="relative">
-						<img src="img/shots/relic-arena.webp" alt="A relic arena on a stone dais in the river, ringed by a violet barrier, with heroes fighting inside" width="960" height="1080" className="aspect-[4/3] w-full object-cover lg:aspect-auto lg:h-full" loading="lazy" />
+						<img src="img/shots/relic-arena-capture.webp" alt="Heroes fighting inside a relic arena in the river while the blue team's colour fills the capture circle round the altar" width="1120" height="1260" className="aspect-[4/3] w-full object-cover lg:aspect-auto lg:h-full" loading="lazy" />
 					</figure>
 					<div className="p-6 sm:p-8">
 						<div className="flex items-center gap-4">
@@ -263,7 +312,7 @@ function Mechanics() {
 							</div>
 						</div>
 						<p className="mt-4 text-cream/90">
-							Relics are the only items in the game, and you win them in a walled arena instead of buying them.
+							Relics are the only items in the game. You don't buy them: you win them in a walled arena in the river.
 						</p>
 						<ol className="mt-6 grid gap-4">
 							{ARENA_STEPS.map(([title, body], i) => (
@@ -277,11 +326,30 @@ function Mechanics() {
 							))}
 						</ol>
 						<p className="mt-6 border-t-2 border-arena-light/30 pt-4 text-sm text-cream/80">
-							Relics grow stronger with their holder's level and stay with you when you die, but every relic you hold slows the experience you earn. Nobody snowballs for free.
+							Relics grow stronger with their holder's level and stay with you when you die. A hero carries up to three and can hand one to a teammate standing close by. But every relic you hold cuts the experience you earn, a little for the first and a lot for the third. Nobody snowballs for free.
 						</p>
 						<div className="mt-5">
-							<p className="font-pixel text-[11px] uppercase tracking-widest text-arena-text/80">Twelve relics to fight for</p>
-							<img src="img/relic-icons.webp" alt="Twelve pixel-art relic icons, including a cracked ember heart, a winged eye, an axe, a feather, a ringed arcane orb and a starry potion phial" width="1072" height="368" className="pixelated mt-3 w-full max-w-md" loading="lazy" />
+							<p className="font-pixel text-[11px] uppercase tracking-widest text-arena-text/80">Relics to fight for</p>
+							<ul className="relative mt-3 grid max-w-md grid-cols-5 gap-1 sm:grid-cols-7" aria-label="Relics">
+								{RELICS.map((r) => (
+									<li key={r.id}>
+										<Tip
+											label={`${r.name}: ${r.bonus.join(", ")}`}
+											className="block"
+											anchored={false}
+											tip={
+												<>
+													<span className="block font-heading text-base font-bold uppercase text-gold">{r.name}</span>
+													<span className="mt-1 block text-cream/80">{r.bonus.join(" · ")}</span>
+												</>
+											}
+										>
+											<img src={`img/relics/${r.id}.webp`} alt="" width="160" height="160" className="pixelated w-full transition hover:brightness-125" loading="lazy" />
+										</Tip>
+									</li>
+								))}
+							</ul>
+							<p className="mt-2 text-xs text-cream/60">More relics join as the game grows. Bonuses shown at level 1.</p>
 						</div>
 					</div>
 				</Panel>
@@ -387,30 +455,31 @@ function PixelArt() {
 	);
 }
 
-// Starting attribute points from the game's hero data (data/heroes/*.tres, starting_str/agi/int),
-// grouped by role. `frame` is the animation size in sprite pixels where it is not 96x112
-// (heroes whose long weapons need wider sheets).
+// Generated from the game's hero data (data/heroes/*.tres and data/abilities/*.tres): starting
+// attributes, and for each skill its in-game description plus rank 1 to max numbers (damage, heal,
+// shield, cooldown, mana). `forms` are the skills a transformation swaps in. `frame` is the animation
+// size in sprite pixels where it is not 96x112 (heroes whose long weapons need wider sheets).
 const ROSTER = [
-	{ id: "bastion_grael", name: "Bastion Grael", role: "Tank", primary: "STR", attributes: { STR: 5, AGI: 2, INT: 3 }, passive: "Stoneskin", kit: ["Shield Bash", "Bulwark", "Taunt Slam", "Fortress"] },
-	{ id: "haldor_quakeborn", name: "Haldor Quakeborn", role: "Tank", primary: "STR", attributes: { STR: 5, AGI: 3, INT: 2 }, passive: "Aftershock", kit: ["Fault Line", "Stone Stride", "Seismic Grip", "Mountain's Fall"] },
-	{ id: "gorran_bellwarden", name: "Gorran Bellwarden", role: "Tank", primary: "STR", attributes: { STR: 5, AGI: 2, INT: 3 }, passive: "Deep Toll", kit: ["Toll", "Bell Ward", "Chain of Vows", "Great Bell"] },
-	{ id: "rhea_ironfang", name: "Rhea Ironfang", role: "Fighter", primary: "STR", attributes: { STR: 5, AGI: 4, INT: 1 }, passive: "Bloodlust", kit: ["Rend", "Roar", "Ground Slam", "Primal Form"] },
-	{ id: "varga_thornhide", name: "Varga Thornhide", role: "Fighter", primary: "STR", attributes: { STR: 5, AGI: 3, INT: 2 }, passive: "Bramblehide", kit: ["Gore", "Dig In", "Trample", "Hog Wild"], frame: [128, 144] },
-	{ id: "ilka_spearwind", name: "Ilka Spearwind", role: "Fighter", primary: "AGI", attributes: { STR: 3, AGI: 5, INT: 2 }, passive: "Reach", kit: ["Impale", "Set the Pike", "Sweep", "Hundred Thrusts"], frame: [128, 144] },
-	{ id: "sefa_twinmoon", name: "Sefa Twinmoon", role: "Fighter", primary: "AGI", attributes: { STR: 3, AGI: 5, INT: 2 }, passive: "Moon Rhythm", kit: ["Waxing Throw", "Eclipse Spin", "Crescent Pin", "Full Moon"] },
-	{ id: "kira_vex", name: "Kira Vex", role: "Assassin", primary: "AGI", attributes: { STR: 3, AGI: 5, INT: 2 }, passive: "Backstab", kit: ["Shadow Bind", "Smoke Veil", "Crescent Slash", "Execute"] },
-	{ id: "corvin_ashfeather", name: "Corvin Ashfeather", role: "Assassin", primary: "AGI", attributes: { STR: 2, AGI: 5, INT: 3 }, passive: "Carrion Sense", kit: ["Feather Knives", "Murder of Crows", "Crow's Snare", "Last Rites"] },
-	{ id: "morwen_hexthread", name: "Morwen Hexthread", role: "Assassin", primary: "INT", attributes: { STR: 2, AGI: 3, INT: 5 }, passive: "Stitches", kit: ["Needle Spray", "Poppet", "Marionette", "Cut the Thread"] },
-	{ id: "lyra_thorn", name: "Lyra Thorn", role: "Marksman", primary: "AGI", attributes: { STR: 2, AGI: 5, INT: 3 }, passive: "Hunter's Rhythm", kit: ["Piercing Arrow", "Volley", "Snare Trap", "Hunter's Mark"] },
-	{ id: "fen_mirelight", name: "Fen Mirelight", role: "Marksman", primary: "AGI", attributes: { STR: 2, AGI: 5, INT: 3 }, passive: "Bog Venom", kit: ["Wisp Arrow", "Swamp Gas", "Lantern Toss", "Will-o'-Wisp Hunt"] },
-	{ id: "bramm_stonesling", name: "Bramm Stonesling", role: "Marksman", primary: "STR", attributes: { STR: 5, AGI: 2, INT: 3 }, passive: "Heavy Shot", kit: ["Skipping Stone", "Pebble Hail", "Plant Feet", "Rolling Boulder"] },
-	{ id: "juno_galecaller", name: "Juno Galecaller", role: "Mage", primary: "AGI", attributes: { STR: 2, AGI: 5, INT: 3 }, passive: "Static Charge", kit: ["Arc Bolt", "Tailwind", "Gale Burst", "Eye of the Storm"] },
-	{ id: "orin_ash", name: "Orin Ash", role: "Mage", primary: "INT", attributes: { STR: 2, AGI: 3, INT: 5 }, passive: "Burn", kit: ["Fireball", "Flame Wall", "Scorch", "Meteor"] },
-	{ id: "nyra_frostweave", name: "Nyra Frostweave", role: "Mage", primary: "INT", attributes: { STR: 2, AGI: 3, INT: 5 }, passive: "Frostbite", kit: ["Ice Shard", "Rime Ring", "Cold Snap", "Absolute Zero"] },
-	{ id: "odalys_kilnwright", name: "Odalys Kilnwright", role: "Mage", primary: "INT", attributes: { STR: 2, AGI: 3, INT: 5 }, passive: "Fired Clay", kit: ["Clay Shot", "Shape Golem", "Kiln Blast", "Colossus"] },
-	{ id: "maro_tidecaller", name: "Maro Tidecaller", role: "Support", primary: "INT", attributes: { STR: 3, AGI: 2, INT: 5 }, passive: "Ebb and Flow", kit: ["Tide Orb", "Bubble", "Undertow", "Tsunami"] },
-	{ id: "sela_dawnsong", name: "Sela Dawnsong", role: "Support", primary: "INT", attributes: { STR: 3, AGI: 2, INT: 5 }, passive: "Morning Light", kit: ["Sunlance", "Anthem", "Dazzle", "Sanctuary"] },
-	{ id: "tobren_anvilheart", name: "Tobren Anvilheart", role: "Support", primary: "STR", attributes: { STR: 5, AGI: 2, INT: 3 }, passive: "Bodyguard", kit: ["Temper", "Anvil Drop", "Hot Rivet", "Forge Oath"] },
+	{"id": "bastion_grael", "name": "Bastion Grael", "role": "Tank", "primary": "STR", "attributes": {"STR": 5, "AGI": 2, "INT": 3}, "kit": [{"key": "P", "name": "Stoneskin", "text": "After taking 20% of his max health within 3 s, Bastion gains a shield of 40 + 10% max health for 3 s. 12 s cooldown."}, {"key": "Q", "name": "Shield Bash", "text": "Slam the shield forward, stunning enemies in front for 1 s.", "stats": ["60–200 physical damage + 4% of max health", "Cooldown 10–8 s", "Mana 50–70"]}, {"key": "W", "name": "Bulwark", "text": "Shield Bastion and allied heroes within 6 m for 3 s.", "stats": ["Shield 60–180", "Cooldown 16–12 s", "Mana 60–80"]}, {"key": "E", "name": "Taunt Slam", "text": "Strike the ground. Enemies within 3.5 m take damage and are taunted: for 1.25 s they can only attack Bastion.", "stats": ["50–170 magic damage + 3% of max health", "Cooldown 14–10 s", "Mana 70–90"]}, {"key": "R", "name": "Fortress", "text": "Raise a stone ring where Bastion stands. For 5 s, allies inside take 30% less damage.", "stats": ["Cooldown 100–70 s", "Mana 100"]}]},
+	{"id": "haldor_quakeborn", "name": "Haldor Quakeborn", "role": "Tank", "primary": "STR", "attributes": {"STR": 5, "AGI": 3, "INT": 2}, "kit": [{"key": "P", "name": "Aftershock", "text": "Every 7 s, Haldor's next basic attack on a hero or minion cracks the ground under it: enemies within 2 m take 30 + 3% of his max health as magic damage and are slowed by 20% for 1.5 s."}, {"key": "Q", "name": "Fault Line", "text": "Split the ground in a 9 m line ahead. After 0.5 s, enemies on it take damage and are slowed by 40% for 1.5 s.", "stats": ["60–180 magic damage + 4% of max health", "Cooldown 9–7 s", "Mana 55–75"]}, {"key": "W", "name": "Stone Stride", "text": "Shake off enemy slows and stuns. For 3 s Haldor is unstoppable (nothing can stun, slow, root, taunt or move him) and walks 25% faster. He still takes damage.", "stats": ["Cooldown 18–14 s", "Mana 60"]}, {"key": "E", "name": "Seismic Grip", "text": "Haldor clenches the earth. After 0.35 s, enemies within 4.5 m take damage and are dragged 2.5 m towards him.", "stats": ["50–150 magic damage + 3% of max health", "Cooldown 13–9 s", "Mana 65–85"]}, {"key": "R", "name": "Mountain's Fall", "text": "Haldor raises his fists and brings them down. After 0.9 s, enemies within 5 m take heavy damage and are knocked up for 1.25 s.", "stats": ["150–350 magic damage + 6% of max health", "Cooldown 110–80 s", "Mana 100"]}]},
+	{"id": "gorran_bellwarden", "name": "Gorran Bellwarden", "role": "Tank", "primary": "STR", "attributes": {"STR": 5, "AGI": 2, "INT": 3}, "kit": [{"key": "P", "name": "Deep Toll", "text": "Toll, Chain of Vows and Great Bell Ring enemy heroes for 6 s. The 2nd Ring silences them for 1.25 s (no abilities, attacks still work); then that hero cannot be Rung for 8 s."}, {"key": "Q", "name": "Toll", "text": "Strike the bell. Enemies in a 5 m cone take damage and are slowed by 25% for 1.5 s.", "stats": ["60–200 magic damage + 4% of max health", "Cooldown 8–6 s", "Mana 50–70"]}, {"key": "W", "name": "Bell Ward", "text": "Set a small bell at a point for 5 s. Allied heroes within 4 m take 15% less damage; enemies there are slowed by 15%.", "stats": ["Cooldown 16–12 s", "Mana 60–80"]}, {"key": "E", "name": "Chain of Vows", "text": "Throw a chain 9 m. The first enemy hero hit takes damage and is chained to Gorran for 3 s: if they get more than 6 m from him they are dragged 3 m back and stunned for 0.75 s, and the chain breaks.", "stats": ["40–140 magic damage + 3% of max health", "Cooldown 14–10 s", "Mana 60–80"]}, {"key": "R", "name": "Great Bell", "text": "Drop a giant bell on a point. After 0.6 s enemies within 2 m take damage; then a 3.5 m ring stands for 3 s that enemies cannot walk across either way. Allies walk through it.", "stats": ["150–300 magic damage + 5% of max health", "Cooldown 110–80 s", "Mana 100"]}]},
+	{"id": "rhea_ironfang", "name": "Rhea Ironfang", "role": "Fighter", "primary": "STR", "attributes": {"STR": 5, "AGI": 4, "INT": 1}, "kit": [{"key": "P", "name": "Bloodlust", "text": "Each enemy Rhea's abilities hit heals her for 12 + 1.5% of her max health."}, {"key": "Q", "name": "Rend", "text": "Claw in front of Rhea. Enemies hit bleed for 12 magic damage per second for 3 s, stacking up to 3 times.", "stats": ["50–170 physical damage + 70% of attack damage", "Cooldown 8–6 s", "Mana 40–60"]}, {"key": "W", "name": "Roar", "text": "Roar. Enemies within 5 m take damage and are slowed by 35% for 2 s.", "stats": ["30–110 magic damage + 2% of max health", "Cooldown 14–10 s", "Mana 60"]}, {"key": "E", "name": "Ground Slam", "text": "Slam the ground at a point. Enemies within 2.2 m take damage and are knocked up for 0.75 s.", "stats": ["70–230 physical damage + 60% of attack damage", "Cooldown 15–11 s", "Mana 70"]}, {"key": "R", "name": "Primal Form", "text": "Become the beast for 10 s: 30% harder attacks, 15% faster, 15% less damage taken, and Q, W and E become Maul, Howl and Savage Slam.", "stats": ["Cooldown 100–70 s", "Mana 100"], "forms": [{"key": "Q", "name": "Maul", "text": "Beast form. A wider, harder claw that adds two Bleed stacks.", "stats": ["80–260 physical damage + 90% of attack damage", "Cooldown 6–4 s", "Mana 30–50"]}, {"key": "W", "name": "Howl", "text": "Beast form. Enemies within 6 m take damage and are slowed by 50% for 2 s.", "stats": ["50–150 magic damage + 3% of max health", "Cooldown 12–8 s", "Mana 50"]}, {"key": "E", "name": "Savage Slam", "text": "Beast form. A bigger slam: enemies within 3 m are knocked up for 1 s.", "stats": ["100–300 physical damage + 80% of attack damage", "Cooldown 13–9 s", "Mana 60"]}]}]},
+	{"id": "varga_thornhide", "name": "Varga Thornhide", "role": "Fighter", "primary": "STR", "attributes": {"STR": 5, "AGI": 3, "INT": 2}, "kit": [{"key": "P", "name": "Bramblehide", "text": "Melee basic attacks from heroes and creeps on Varga deal 15% of their damage back to the attacker as magic damage."}, {"key": "Q", "name": "Gore", "text": "Swipe her tusks in front. Enemies hit take damage and are tossed 1.5 m out to the side.", "stats": ["60–200 physical damage + 70% of attack damage", "Cooldown 8–6 s", "Mana 40–60"]}, {"key": "W", "name": "Dig In", "text": "Dig in for 2 s: Varga cannot move but still attacks and casts, takes 30% less damage, and enemies within 3 m are slowed by 25%.", "stats": ["Cooldown 16–12 s", "Mana 50"]}, {"key": "E", "name": "Trample", "text": "For 3 s Varga walks 25% faster and through minions, creeps and summons instead of being blocked. Each enemy unit she walks through takes damage once. Heroes still block her.", "stats": ["30–90 physical damage + 30% of attack damage", "Cooldown 18–14 s", "Mana 60"]}, {"key": "R", "name": "Hog Wild", "text": "For 8 s her basic attacks cleave a 2.5 m arc for 60% damage, heal her for 8% of the damage dealt (half from minions and creeps), and slows do not affect her.", "stats": ["Cooldown 100–70 s", "Mana 100"]}], "frame": [128, 144]},
+	{"id": "ilka_spearwind", "name": "Ilka Spearwind", "role": "Fighter", "primary": "AGI", "attributes": {"STR": 3, "AGI": 5, "INT": 2}, "kit": [{"key": "P", "name": "Reach", "text": "Ilka's basic attacks landed from more than 2 m away deal 20% more damage and slow by 15% for 1 s."}, {"key": "Q", "name": "Impale", "text": "Thrust 5 m ahead. The first enemy hit takes damage and is rooted for 0.75 s.", "stats": ["60–200 physical damage + 80% of attack damage", "Cooldown 9–7 s", "Mana 45–65"]}, {"key": "W", "name": "Set the Pike", "text": "Brace for 2 s, standing still. The first enemy hero in front of Ilka (4 m) takes heavy damage and is stunned for 1 s, and the brace ends.", "stats": ["80–260 physical damage + 100% of attack damage", "Cooldown 18–14 s", "Mana 60"]}, {"key": "E", "name": "Sweep", "text": "Sweep the pike all round. Enemies within 3 m take damage and are knocked 2 m away.", "stats": ["40–140 physical damage + 50% of attack damage", "Cooldown 12–9 s", "Mana 50–70"]}, {"key": "R", "name": "Hundred Thrusts", "text": "Channel for 2 s, thrusting into a 6 m cone 8 times. Each hit slows by 8% more, up to 40%. Stuns, pushes and new orders end it.", "stats": ["20–40 physical damage + 20% of attack damage per hit", "Cooldown 90–60 s", "Mana 100"]}], "frame": [128, 144]},
+	{"id": "sefa_twinmoon", "name": "Sefa Twinmoon", "role": "Fighter", "primary": "AGI", "attributes": {"STR": 3, "AGI": 5, "INT": 2}, "kit": [{"key": "P", "name": "Moon Rhythm", "text": "A basic attack on a different unit than Sefa's last one gives her 6% more attack speed for 4 s, stacking 5 times (30%)."}, {"key": "Q", "name": "Waxing Throw", "text": "Throw a ring-blade 8 m. It passes through enemies and flies back to wherever Sefa stands, hitting again. A unit hit both ways takes half damage on the return.", "stats": ["45–145 physical damage + 60% of attack damage", "Cooldown 7–5 s", "Mana 40–60"]}, {"key": "W", "name": "Eclipse Spin", "text": "Spin for 1.5 s, hitting enemies within 3 m three times. While spinning she takes 30% less damage from basic attacks and walks at 80% speed.", "stats": ["25–85 physical damage + 30% of attack damage per hit", "Cooldown 12–9 s", "Mana 50–70"]}, {"key": "E", "name": "Crescent Pin", "text": "Hurl a blade 9 m. The first enemy hit takes damage and is pinned for 1.5 s: it cannot move more than 2.5 m from where it was hit.", "stats": ["50–170 physical damage + 50% of attack damage", "Cooldown 14–10 s", "Mana 60"]}, {"key": "R", "name": "Full Moon", "text": "For 6 s both blades orbit Sefa, hitting each enemy within 3 m every 0.5 s. Each hit cuts that enemy's armor by 4% for 4 s, up to 20%.", "stats": ["20–40 physical damage + 20% of attack damage per hit", "Cooldown 90–60 s", "Mana 100"]}]},
+	{"id": "kira_vex", "name": "Kira Vex", "role": "Assassin", "primary": "AGI", "attributes": {"STR": 3, "AGI": 5, "INT": 2}, "kit": [{"key": "P", "name": "Backstab", "text": "Kira's attacks and abilities deal 25% more damage to enemies facing away from her."}, {"key": "Q", "name": "Shadow Bind", "text": "Throw a shadow tether. The first enemy hit takes damage and is slowed by 45% for 2.5 s.", "stats": ["50–170 physical damage + 50% of attack damage", "Cooldown 10–8 s", "Mana 50–70"]}, {"key": "W", "name": "Smoke Veil", "text": "Fill an area with smoke for 4 s. Enemies inside miss their basic attacks. It hides nothing: everyone still sees everyone.", "stats": ["Cooldown 18–14 s", "Mana 70"]}, {"key": "E", "name": "Crescent Slash", "text": "Slash in a wide arc in front of Kira.", "stats": ["55–195 physical damage + 80% of attack damage", "Cooldown 7–5 s", "Mana 40–60"]}, {"key": "R", "name": "Execute", "text": "Strike the first enemy within 5 m. Damage rises with the target's missing health, up to double.", "stats": ["150–350 physical damage + 100% of attack damage", "Cooldown 80–50 s", "Mana 100"]}]},
+	{"id": "corvin_ashfeather", "name": "Corvin Ashfeather", "role": "Assassin", "primary": "AGI", "attributes": {"STR": 2, "AGI": 5, "INT": 3}, "kit": [{"key": "P", "name": "Carrion Sense", "text": "Enemy heroes below 30% health within 15 m of Corvin are shown through fog to his team."}, {"key": "Q", "name": "Feather Knives", "text": "Throw three knives in a 25 degree fan, each stopping at the first enemy hit. A unit hit by all three takes 50% more from the third.", "stats": ["40–140 physical damage + 60% of attack damage", "Cooldown 7–5 s", "Mana 45–65"]}, {"key": "W", "name": "Murder of Crows", "text": "Send crows at an enemy hero for 4 s. They show it through fog to his team and peck it for magic damage every second, and Corvin walks 25% faster meanwhile.", "stats": ["Cooldown 16–12 s", "Mana 60"]}, {"key": "E", "name": "Crow's Snare", "text": "Curse an enemy hero for 3 s. If they walk 3 m from where they were cursed they take damage and are rooted for 1.5 s, and the curse ends. Standing still is safe.", "stats": ["50–170 physical damage + 50% of attack damage", "Cooldown 14–10 s", "Mana 60–80"]}, {"key": "R", "name": "Last Rites", "text": "Mark an enemy hero for 5 s. A quarter of the damage his team deals them is dealt again when the mark ends. If they die marked, Feather Knives and Murder of Crows come off cooldown.", "stats": ["Cooldown 90–60 s", "Mana 100"]}]},
+	{"id": "morwen_hexthread", "name": "Morwen Hexthread", "role": "Assassin", "primary": "INT", "attributes": {"STR": 2, "AGI": 3, "INT": 5}, "kit": [{"key": "P", "name": "Stitches", "text": "Each of Morwen's ability hits sews a Stitch into an enemy hero, up to 3, for 6 s."}, {"key": "Q", "name": "Needle Spray", "text": "Fling needles in a narrow 6 m cone for magic damage.", "stats": ["60–200 magic damage", "Cooldown 7–5 s", "Mana 50–70"]}, {"key": "W", "name": "Poppet", "text": "Throw a doll to a point. It stands for 4 s with 150 + 25 per level health. The first enemy hero within 3 m is bound to it and Stitched; then half the damage Morwen's team deals the doll is dealt to that hero as magic damage. Enemies can break it.", "stats": ["Cooldown 16–12 s", "Mana 70"]}, {"key": "E", "name": "Marionette", "text": "Tug the strings on an enemy hero: for 1 s they are Charmed and walk towards Morwen, unable to attack or cast.", "stats": ["40–120 magic damage", "Cooldown 16–12 s", "Mana 70"]}, {"key": "R", "name": "Cut the Thread", "text": "Snip every Stitch on an enemy hero for heavy magic damage, plus 8% of their missing health per Stitch. Removes the Stitches.", "stats": ["150–300 magic damage", "Cooldown 80–50 s", "Mana 100"]}]},
+	{"id": "lyra_thorn", "name": "Lyra Thorn", "role": "Marksman", "primary": "AGI", "attributes": {"STR": 2, "AGI": 5, "INT": 3}, "kit": [{"key": "P", "name": "Hunter's Rhythm", "text": "Every 4th basic attack is a critical hit."}, {"key": "Q", "name": "Piercing Arrow", "text": "Loose an arrow that passes through every enemy in a line. Scales with attack damage.", "stats": ["50–170 physical damage + 100% of attack damage", "Cooldown 8–6 s", "Mana 45–65"]}, {"key": "W", "name": "Volley", "text": "Fire a spread of arrows in a cone in front of Lyra.", "stats": ["40–140 physical damage + 60% of attack damage", "Cooldown 10–8 s", "Mana 60–80"]}, {"key": "E", "name": "Snare Trap", "text": "Set a visible trap that arms after 0.6 s and lasts 30 s. The first enemy to step in takes damage and is rooted for 1.5 s.", "stats": ["30–110 magic damage", "Cooldown 18–10 s", "Mana 50"]}, {"key": "R", "name": "Hunter's Mark", "text": "After a 0.6 s draw, fire a long-range shot that hits the first enemy in its path for heavy damage.", "stats": ["200–440 physical damage + 120% of attack damage", "Cooldown 80–60 s", "Mana 100"]}]},
+	{"id": "fen_mirelight", "name": "Fen Mirelight", "role": "Marksman", "primary": "AGI", "attributes": {"STR": 2, "AGI": 5, "INT": 3}, "kit": [{"key": "P", "name": "Bog Venom", "text": "Fen's basic attacks add a Venom stack for 4 s, up to 4: 5 magic damage per second and 10% less healing received per stack (40% at 4)."}, {"key": "Q", "name": "Wisp Arrow", "text": "An arrow that damages the first enemy hit and adds a Venom stack. A wisp stays where it hit (or where it fell) and lights a 6 m circle through the fog for 8 s.", "stats": ["60–200 physical damage + 90% of attack damage", "Cooldown 9–7 s", "Mana 50–70"]}, {"key": "W", "name": "Swamp Gas", "text": "A 3 m cloud of marsh gas for 3 s. Enemies inside are slowed by 25% and take poison damage every 0.5 s.", "stats": ["10–34 magic damage + 10% of attack damage per hit", "Cooldown 14–10 s", "Mana 60–80"]}, {"key": "E", "name": "Lantern Toss", "text": "Toss his lantern 8 m to the first allied hero in its path: +25% attack speed and +4 m sight for 5 s. If it reaches no ally, Fen keeps it for half the bonus.", "stats": ["Cooldown 18–14 s", "Mana 50"]}, {"key": "R", "name": "Will-o'-Wisp Hunt", "text": "Release 6 wisps that seek the enemy heroes within 12 m, spread across them, at most 3 on one hero. Each wisp deals damage and adds a Venom stack.", "stats": ["50–100 magic damage + 30% of attack damage", "Cooldown 90–60 s", "Mana 100"]}]},
+	{"id": "bramm_stonesling", "name": "Bramm Stonesling", "role": "Marksman", "primary": "STR", "attributes": {"STR": 5, "AGI": 2, "INT": 3}, "kit": [{"key": "P", "name": "Heavy Shot", "text": "Bramm's basic attacks on heroes, minions and creeps splash: other enemies within 1.5 m take 40% of the damage. Attacks on towers do not splash."}, {"key": "Q", "name": "Skipping Stone", "text": "Skip a stone three times along a 10 m line. Each bounce damages enemies within 1.5 m; nobody is hit twice.", "stats": ["50–170 physical damage + 70% of attack damage", "Cooldown 8–6 s", "Mana 45–65"]}, {"key": "W", "name": "Pebble Hail", "text": "After 0.8 s, gravel rains on a 2.5 m area: enemies there take damage and are slowed by 30% for 1.5 s.", "stats": ["60–180 physical damage + 50% of attack damage", "Cooldown 12–9 s", "Mana 60–80"]}, {"key": "E", "name": "Plant Feet", "text": "Plant his feet for 4 s: Bramm cannot move, but his basic attacks reach 2 m further against heroes, minions and creeps (not towers) and he has 20% more armor.", "stats": ["Cooldown 16–12 s", "Mana 40"]}, {"key": "R", "name": "Rolling Boulder", "text": "Roll a huge boulder 14 m. Minions and creeps it hits take damage and are shoved 2.5 m aside; it stops at the first enemy hero, who takes damage and is stunned for 1 s.", "stats": ["150–350 physical damage + 100% of attack damage", "Cooldown 100–70 s", "Mana 100"]}]},
+	{"id": "juno_galecaller", "name": "Juno Galecaller", "role": "Mage", "primary": "AGI", "attributes": {"STR": 2, "AGI": 5, "INT": 3}, "kit": [{"key": "P", "name": "Static Charge", "text": "Every 5 s, Juno's next basic attack on a hero or minion discharges: 30 magic damage plus 30% of her attack damage, and a 25% slow for 1 s."}, {"key": "Q", "name": "Arc Bolt", "text": "Hurl a bolt of lightning that passes through every enemy in a line. Scales with attack damage.", "stats": ["55–175 magic damage + 50% of attack damage", "Cooldown 7–5 s", "Mana 45–65"]}, {"key": "W", "name": "Tailwind", "text": "The wind at her back: for 3 s Juno moves 30% faster and her basic attacks hit 20% harder.", "stats": ["Cooldown 16–12 s", "Mana 50"]}, {"key": "E", "name": "Gale Burst", "text": "A blast of wind in front of Juno damages enemies and knocks them 3 m back.", "stats": ["40–120 magic damage", "Cooldown 15–11 s", "Mana 60–80"]}, {"key": "R", "name": "Eye of the Storm", "text": "Call a storm over the target point for 4 s. Lightning strikes enemies inside every 0.5 s, damaging them and slowing them by 20%.", "stats": ["30–60 magic damage + 10% of attack damage per hit", "Cooldown 90–70 s", "Mana 100–150"]}]},
+	{"id": "orin_ash", "name": "Orin Ash", "role": "Mage", "primary": "INT", "attributes": {"STR": 2, "AGI": 3, "INT": 5}, "kit": [{"key": "P", "name": "Burn", "text": "Every ability hit adds a stack of Burn: 6 magic damage per second per stack for 3 s, up to 5 stacks."}, {"key": "Q", "name": "Fireball", "text": "Hurl a fireball that hits the first enemy in its path.", "stats": ["70–230 magic damage", "Cooldown 7–5 s", "Mana 50–70"]}, {"key": "W", "name": "Flame Wall", "text": "Raise a wall of fire across the target point. Enemies inside burn and are slowed by 30%.", "stats": ["12–36 magic damage per hit", "Cooldown 16–12 s", "Mana 70–90"]}, {"key": "E", "name": "Scorch", "text": "Breathe flame in a cone in front of Orin.", "stats": ["60–200 magic damage", "Cooldown 9–7 s", "Mana 60–80"]}, {"key": "R", "name": "Meteor", "text": "Call down a meteor. After 1.2 s it smashes the target area.", "stats": ["250–500 magic damage", "Cooldown 90–60 s", "Mana 100–150"]}]},
+	{"id": "nyra_frostweave", "name": "Nyra Frostweave", "role": "Mage", "primary": "INT", "attributes": {"STR": 2, "AGI": 3, "INT": 5}, "kit": [{"key": "P", "name": "Frostbite", "text": "Each enemy Nyra's abilities hit gains a stack of Chill (15% slow for 3 s). The third stack freezes it solid: stunned for 1.25 s."}, {"key": "Q", "name": "Ice Shard", "text": "Fire a shard of ice that damages the first enemy hit.", "stats": ["70–210 magic damage", "Cooldown 6.5–4.5 s", "Mana 50–70"]}, {"key": "W", "name": "Rime Ring", "text": "Frost gathers at the target point for 0.8 s, then bursts: enemies inside take damage and are rooted for 1 s.", "stats": ["60–180 magic damage", "Cooldown 14–10 s", "Mana 70–90"]}, {"key": "E", "name": "Cold Snap", "text": "Breathe a cone of cold. Enemies in front take damage and are slowed by 35% for 2 s.", "stats": ["50–150 magic damage", "Cooldown 10–8 s", "Mana 60–80"]}, {"key": "R", "name": "Absolute Zero", "text": "After 1.2 s, the air at the target point freezes. Enemies inside take heavy damage and gain two extra Chill stacks, so Frostbite freezes them.", "stats": ["200–400 magic damage", "Cooldown 100–70 s", "Mana 100–150"]}]},
+	{"id": "odalys_kilnwright", "name": "Odalys Kilnwright", "role": "Mage", "primary": "INT", "attributes": {"STR": 2, "AGI": 3, "INT": 5}, "kit": [{"key": "P", "name": "Fired Clay", "text": "Her golems are solid and block heroes the way minions do. When a golem is destroyed or burst, it cracks for 40 + 4 per level magic damage within 2 m."}, {"key": "Q", "name": "Clay Shot", "text": "Throw a lump of hot clay 10 m. It passes through her own golems, damages the first enemy hit and slows it by 20% for 1.5 s.", "stats": ["65–205 magic damage", "Cooldown 7–5 s", "Mana 50–70"]}, {"key": "W", "name": "Shape Golem", "text": "Raise a golem at a point for 6 s, up to 2 at once (a 3rd replaces the oldest). It does not move, taunts enemy minions and creeps within 4 m, and slaps enemies within 1.5 m every second.", "stats": ["Cooldown 10–7 s", "Mana 60"]}, {"key": "E", "name": "Kiln Blast", "text": "Every golem of hers within 15 m bursts. Enemies within 2.5 m of a golem take magic damage and are knocked 2 m away from it; an enemy caught by two bursts takes half from the second.", "stats": ["60–200 magic damage", "Cooldown 12–8 s", "Mana 60–80"]}, {"key": "R", "name": "Colossus", "text": "Raise one huge golem for 10 s. It walks where Odalys moves or attack-moves, is solid, and slams every 2 s, damaging enemies within 2.5 m and slowing them by 20% for 1 s. Kiln Blast does not burst it.", "stats": ["Cooldown 110–80 s", "Mana 100–150"]}]},
+	{"id": "maro_tidecaller", "name": "Maro Tidecaller", "role": "Support", "primary": "INT", "attributes": {"STR": 3, "AGI": 2, "INT": 5}, "kit": [{"key": "P", "name": "Ebb and Flow", "text": "Every heal Maro casts gives him 25% of the health restored as mana."}, {"key": "Q", "name": "Tide Orb", "text": "Throw an orb of water. It heals the first allied hero it reaches, or damages the first enemy.", "stats": ["60–200 magic damage", "Heals 50–150", "Cooldown 8–6 s", "Mana 60–80"]}, {"key": "W", "name": "Bubble", "text": "Wrap allied heroes at the target point (Maro too) in a bubble: a 2.5 s shield, and enemy stuns, slows and burns are washed off.", "stats": ["Shield 60–180", "Cooldown 15–11 s", "Mana 70–90"]}, {"key": "E", "name": "Undertow", "text": "Cast a current that drags the first enemy hit 4 m towards Maro.", "stats": ["50–170 magic damage", "Cooldown 16–12 s", "Mana 70"]}, {"key": "R", "name": "Tsunami", "text": "Send a 4 m wide wave 10 m forward. Enemies hit take damage, are knocked back 4 m and slowed by 40% for 2 s.", "stats": ["150–300 magic damage", "Cooldown 110–80 s", "Mana 120"]}]},
+	{"id": "sela_dawnsong", "name": "Sela Dawnsong", "role": "Support", "primary": "INT", "attributes": {"STR": 3, "AGI": 2, "INT": 5}, "kit": [{"key": "P", "name": "Morning Light", "text": "Whenever Sela heals someone, she moves 20% faster for 1.5 s."}, {"key": "Q", "name": "Sunlance", "text": "A spear of light lances ahead. Enemies on it take damage; allied heroes on it (not Sela) are healed.", "stats": ["60–180 magic damage", "Heals 40–120", "Cooldown 8–6 s", "Mana 60–80"]}, {"key": "W", "name": "Anthem", "text": "Sing out. Allied heroes within 6 m (Sela too) are healed and move 30% faster for 2 s.", "stats": ["Heals 30–90", "Cooldown 16–12 s", "Mana 70–90"]}, {"key": "E", "name": "Dazzle", "text": "A flash of sunlight at the target point. Enemies inside take damage and are blinded for 1.5 s: their basic attacks miss.", "stats": ["40–120 magic damage", "Cooldown 14–10 s", "Mana 60–80"]}, {"key": "R", "name": "Sanctuary", "text": "Bless the ground at the target point for 4 s. Allied heroes inside are healed every 0.5 s and take 25% less damage.", "stats": ["Heals 20–40 per pulse", "Cooldown 120–80 s", "Mana 100–150"]}]},
+	{"id": "tobren_anvilheart", "name": "Tobren Anvilheart", "role": "Support", "primary": "STR", "attributes": {"STR": 5, "AGI": 2, "INT": 3}, "kit": [{"key": "P", "name": "Bodyguard", "text": "Allied heroes within 4 m of Tobren (not Tobren himself) take 6% less damage."}, {"key": "Q", "name": "Temper", "text": "Strike the first hero in a 7 m line. An ally gets 20% more armor and 15% more attack damage for 4 s; an enemy takes damage and is slowed by 30% for 1.5 s.", "stats": ["50–170 physical damage + 4% of max health", "Cooldown 9–7 s", "Mana 50–70"]}, {"key": "W", "name": "Anvil Drop", "text": "After 0.6 s an anvil lands on a 1.5 m area. Enemies under it take damage and are stunned for 1 s.", "stats": ["70–230 physical damage + 4% of max health", "Cooldown 14–10 s", "Mana 70"]}, {"key": "E", "name": "Hot Rivet", "text": "Rivet himself to the first allied hero in a 7 m line for 4 s (it breaks beyond 10 m). Tobren takes 30% of the damage they take in their place, through his own armor and magic resist.", "stats": ["Cooldown 18–14 s", "Mana 60"]}, {"key": "R", "name": "Forge Oath", "text": "For 6 s, allied heroes within 7 m (Tobren too) deal 15% more damage, and their basic attacks set the target burning.", "stats": ["Cooldown 100–70 s", "Mana 100"]}]},
 ];
 const ATTRIBUTE_MAX = 5;
 const ATTRIBUTE_COLORS = { STR: "bg-[#d0503c]", AGI: "bg-[#58be46]", INT: "bg-[#4678e6]" };
@@ -432,6 +501,32 @@ function AttributeRow({ label, value, primary }) {
 			</span>
 			<span className="text-right font-pixel text-xs text-cream">{value}</span>
 		</div>
+	);
+}
+
+function SkillTip({ skill }) {
+	return (
+		<>
+			<span className="block font-pixel text-[10px] uppercase tracking-widest text-violet-light">{skill.key === "P" ? "Passive" : `${skill.key} ability`}</span>
+			<span className="block font-heading text-base font-bold uppercase text-gold">{skill.name}</span>
+			<span className="mt-1 block leading-snug text-cream/90">{skill.text}</span>
+			{skill.stats && (
+				<span className="mt-2 block border-t border-bronze-dark pt-2 text-xs text-muted">
+					{skill.stats.map((line) => (
+						<span key={line} className="block">{line}</span>
+					))}
+				</span>
+			)}
+			{skill.forms && (
+				<span className="mt-2 block border-t border-bronze-dark pt-2 text-xs text-cream/80">
+					{skill.forms.map((f) => (
+						<span key={f.name} className="mt-1 block">
+							<span className="font-pixel text-gold">{f.key}</span> <span className="font-bold">{f.name}:</span> {f.text}
+						</span>
+					))}
+				</span>
+			)}
+		</>
 	);
 }
 
@@ -485,15 +580,18 @@ function Heroes() {
 						<div className="mt-6">
 							<p className="font-pixel text-[11px] uppercase tracking-widest text-muted">Abilities</p>
 							<ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-								<li className="flex items-center gap-3 border-2 border-bronze-dark bg-ink/40 px-3 py-2 text-sm text-cream">
-									<span className="font-pixel text-xs text-violet-light">P</span> {selected.passive}
-								</li>
-								{selected.kit.map((a, i) => (
-									<li key={a} className="flex items-center gap-3 border-2 border-bronze-dark bg-ink/40 px-3 py-2 text-sm text-cream">
-										<span className="font-pixel text-xs text-gold">{"QWER"[i]}</span> {a}
+								{selected.kit.map((a) => (
+									<li key={a.key}>
+										<Tip label={`${a.key === "P" ? "Passive" : a.key}: ${a.name}. ${a.text}`} className="block" tip={<SkillTip skill={a} />}>
+											<span className="flex items-center gap-3 border-2 border-bronze-dark bg-ink/40 px-3 py-2 text-sm text-cream transition hover:border-gold">
+												<span className={`font-pixel text-xs ${a.key === "P" ? "text-violet-light" : "text-gold"}`}>{a.key}</span> {a.name}
+												<span className="ml-auto font-pixel text-[10px] text-muted" aria-hidden="true">?</span>
+											</span>
+										</Tip>
 									</li>
 								))}
 							</ul>
+							<p className="mt-2 text-xs text-muted">Hover or tap a skill for what it does. Numbers run from rank 1 to max rank.</p>
 						</div>
 					</Panel>
 				</div>
