@@ -655,7 +655,7 @@ function RegisterForm() {
 					{state.status === "sending" ? "Creating account…" : "Create account"}
 				</span>
 			</button>
-			<p className="text-xs text-muted">We only use your email to sign you in and to send your alpha invite. Your birthday stays private. Your username and country are public on leaderboards.</p>
+			<p className="text-xs text-muted">We only use your email to sign you in and to send your alpha invite. Your birthday stays private. Your username and country are public on leaderboards. See our <a href="privacy.html" className="text-gold hover:text-bronze-light">privacy policy</a>.</p>
 		</form>
 	);
 }
@@ -710,6 +710,7 @@ function Footer() {
 					<li><a href="devlog/" className="text-muted hover:text-gold">Devlog</a></li>
 					<li><a href="timeline.html" className="text-muted hover:text-gold">Timeline</a></li>
 					<li><a href="#register" className="text-muted hover:text-gold">Register</a></li>
+					<li><a href="privacy.html" className="text-muted hover:text-gold">Privacy</a></li>
 				</ul>
 				<SocialLinks size={28} />
 			</div>
