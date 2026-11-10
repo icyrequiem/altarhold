@@ -260,23 +260,37 @@ const ARENA_STEPS = [
 	["Captured", "Outnumber the enemy in the centre circle and it fills with your team's colour; an even count resets it. When it is full the arena shatters and your team's highest-level hero takes the relic."],
 ];
 
-// The relics in the game (data/relics/*.tres): their attribute points and their bonus at level 1.
+// The relics in the game (data/relics/*.tres): their attribute points and their stat bonus at level 1.
+// The stat bonus grows with the holder's level (RelicData.level_multiplier: +5% of the level-1 bonus per
+// level above 1, Rules.RELIC_SCALING_PER_LEVEL); the attribute points never change.
 // Icons are the game's own (PixelRelics), rendered at 4x into img/relics/.
+const RELIC_SCALING_PER_LEVEL = 0.05;
+const RELIC_LEVELS = [1, 5, 10, 15, 20];
+// Share of XP lost, by relics held (Rules.RELIC_XP_PENALTY).
+const RELIC_XP_PENALTY = [0, 16, 36, 65];
+
+const relicMultiplier = (level) => 1 + RELIC_SCALING_PER_LEVEL * (level - 1);
+// Rounds to at most `digits` decimals and drops trailing zeros.
+const trim = (n, digits) => String(Number(n.toFixed(digits)));
+
 const RELICS = [
-	{ id: "ember_heart", name: "Ember Heart", bonus: ["+2 STR", "+1.6 health regen/s"] },
-	{ id: "iron_bark", name: "Iron Bark", bonus: ["+2 STR", "+20 armor"] },
-	{ id: "giants_horn", name: "Giant's Horn", bonus: ["+2 STR", "+150 max health"] },
-	{ id: "wolf_fang", name: "Wolf Fang", bonus: ["+2 STR", "+10 attack damage"] },
-	{ id: "hawk_eye", name: "Hawk Eye", bonus: ["+2 AGI", "+10% critical chance"] },
-	{ id: "executioners_edge", name: "Executioner's Edge", bonus: ["+2 AGI", "+40% critical damage"] },
-	{ id: "gale_feather", name: "Gale Feather", bonus: ["+2 AGI", "+5% move speed"] },
-	{ id: "quicksilver_drop", name: "Quicksilver Drop", bonus: ["+2 AGI", "+12% attack speed"] },
-	{ id: "swiftsand_glass", name: "Swiftsand Glass", bonus: ["+2 AGI", "8% shorter cooldowns"] },
-	{ id: "arcane_core", name: "Arcane Core", bonus: ["+2 INT", "+8% ability power"] },
-	{ id: "warding_stone", name: "Warding Stone", bonus: ["+2 INT", "+20 magic resist"] },
-	{ id: "starwell_phial", name: "Starwell Phial", bonus: ["+2 INT", "+150 max mana"] },
-	{ id: "tidal_shell", name: "Tidal Shell", bonus: ["+2 INT", "+1 mana regen/s"] },
+	{ id: "ember_heart", name: "Ember Heart", attr: "STR", base: 1.6, stat: "health regen/s", fmt: (v) => `+${trim(v, 2)}` },
+	{ id: "iron_bark", name: "Iron Bark", attr: "STR", base: 20, stat: "armor", fmt: (v) => `+${trim(v, 0)}` },
+	{ id: "giants_horn", name: "Giant's Horn", attr: "STR", base: 150, stat: "max health", fmt: (v) => `+${trim(v, 0)}` },
+	{ id: "wolf_fang", name: "Wolf Fang", attr: "STR", base: 10, stat: "attack damage", fmt: (v) => `+${trim(v, 1)}` },
+	{ id: "hawk_eye", name: "Hawk Eye", attr: "AGI", base: 10, stat: "critical chance", fmt: (v) => `+${trim(v, 1)}%` },
+	{ id: "executioners_edge", name: "Executioner's Edge", attr: "AGI", base: 40, stat: "critical damage", fmt: (v) => `+${trim(v, 0)}%` },
+	{ id: "gale_feather", name: "Gale Feather", attr: "AGI", base: 5, stat: "move speed", fmt: (v) => `+${trim(v, 2)}%` },
+	{ id: "quicksilver_drop", name: "Quicksilver Drop", attr: "AGI", base: 12, stat: "attack speed", fmt: (v) => `+${trim(v, 1)}%` },
+	{ id: "swiftsand_glass", name: "Swiftsand Glass", attr: "AGI", base: 8, stat: "shorter cooldowns", fmt: (v) => `${trim(v, 1)}%` },
+	{ id: "arcane_core", name: "Arcane Core", attr: "INT", base: 8, stat: "ability power", fmt: (v) => `+${trim(v, 1)}%` },
+	{ id: "warding_stone", name: "Warding Stone", attr: "INT", base: 20, stat: "magic resist", fmt: (v) => `+${trim(v, 0)}` },
+	{ id: "starwell_phial", name: "Starwell Phial", attr: "INT", base: 150, stat: "max mana", fmt: (v) => `+${trim(v, 0)}` },
+	{ id: "tidal_shell", name: "Tidal Shell", attr: "INT", base: 1, stat: "mana regen/s", fmt: (v) => `+${trim(v, 2)}` },
 ];
+
+const relicBonus = (r, level) => r.fmt(r.base * relicMultiplier(level));
+const relicSummary = (r, level = 1) => `+2 ${r.attr}, ${relicBonus(r, level)} ${r.stat}`;
 
 // A hover (or focus, or tap) tip above its trigger, or above the nearest positioned parent when
 // `anchored` is false (for small triggers near a screen edge). `children` is the trigger.
@@ -288,6 +302,50 @@ function Tip({ tip, label, className = "", anchored = true, children }) {
 				{tip}
 			</span>
 		</span>
+	);
+}
+
+// Every relic's stat bonus at a spread of holder levels.
+function RelicProgression() {
+	return (
+		<Panel className="mt-8" inner="p-6 sm:p-8">
+			<p className="font-pixel text-[11px] uppercase tracking-widest text-gold">Relic progression</p>
+			<h3 className="mt-1 font-heading text-2xl font-bold uppercase text-cream sm:text-3xl">A relic grows with its holder</h3>
+			<p className="mt-3 max-w-3xl text-sm text-cream/80">
+				Each relic gives two attribute points that never change, plus a stat bonus that grows by 5% of its starting value with every level its holder gains. At level 20 that bonus is almost double what it was at level 1. Hand a relic to a teammate and it takes on their level at once.
+			</p>
+			<div className="mt-5 overflow-x-auto">
+				<table className="w-full min-w-[34rem] border-collapse text-left text-sm">
+					<caption className="sr-only">Relic stat bonus by holder level</caption>
+					<thead>
+						<tr className="border-b-2 border-bronze/60 font-pixel text-[10px] uppercase tracking-wider text-cream/70">
+							<th scope="col" className="py-2 pr-3 font-normal">Relic</th>
+							<th scope="col" className="py-2 pr-3 font-normal">Bonus</th>
+							{RELIC_LEVELS.map((lv) => (
+								<th key={lv} scope="col" className="px-2 py-2 text-right font-normal">Lv {lv}</th>
+							))}
+						</tr>
+					</thead>
+					<tbody>
+						{RELICS.map((r) => (
+							<tr key={r.id} className="border-b border-bronze/25">
+								<th scope="row" className="py-1.5 pr-3 font-normal">
+									<span className="flex items-center gap-2">
+										<img src={`img/relics/${r.id}.webp`} alt="" width="160" height="160" className="pixelated h-7 w-7" loading="lazy" />
+										<span className="font-bold text-cream">{r.name}</span>
+									</span>
+								</th>
+								<td className="py-1.5 pr-3 text-cream/70">+2 {r.attr}, {r.stat}</td>
+								{RELIC_LEVELS.map((lv) => (
+									<td key={lv} className={`px-2 py-1.5 text-right tabular-nums ${lv === 20 ? "font-bold text-gold" : "text-cream"}`}>{relicBonus(r, lv)}</td>
+								))}
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+			<p className="mt-3 text-xs text-cream/60">Cooldown cuts from relics and AGI together stop at half.</p>
+		</Panel>
 	);
 }
 
@@ -328,19 +386,35 @@ function Mechanics() {
 						<p className="mt-6 border-t-2 border-arena-light/30 pt-4 text-sm text-cream/80">
 							Relics grow stronger with their holder's level and stay with you when you die. A hero carries up to three and can hand one to a teammate standing close by. But every relic you hold cuts the experience you earn, a little for the first and a lot for the third. Nobody snowballs for free.
 						</p>
+						<dl className="mt-4 grid grid-cols-4 gap-1 text-center" aria-label="Experience lost by relics held">
+							{RELIC_XP_PENALTY.map((cut, held) => (
+								<div key={held} className="border-2 border-arena-light/30 px-1 py-2">
+									<dt className="font-pixel text-[9px] uppercase tracking-wider text-arena-text/80">{held} {held === 1 ? "relic" : "relics"}</dt>
+									<dd className="mt-1 font-heading text-lg font-bold text-cream">{cut === 0 ? "Full XP" : `−${cut}% XP`}</dd>
+								</div>
+							))}
+						</dl>
 						<div className="mt-5">
 							<p className="font-pixel text-[11px] uppercase tracking-widest text-arena-text/80">Relics to fight for</p>
 							<ul className="relative mt-3 grid max-w-md grid-cols-5 gap-1 sm:grid-cols-7" aria-label="Relics">
 								{RELICS.map((r) => (
 									<li key={r.id}>
 										<Tip
-											label={`${r.name}: ${r.bonus.join(", ")}`}
+											label={`${r.name}: ${relicSummary(r, 1)} at level 1, rising to ${relicBonus(r, 20)} ${r.stat} at level 20`}
 											className="block"
 											anchored={false}
 											tip={
 												<>
 													<span className="block font-heading text-base font-bold uppercase text-gold">{r.name}</span>
-													<span className="mt-1 block text-cream/80">{r.bonus.join(" · ")}</span>
+													<span className="mt-1 block text-cream/80">+2 {r.attr} · {r.stat}</span>
+													<span className="mt-2 grid grid-cols-5 gap-1 text-center">
+														{RELIC_LEVELS.map((lv) => (
+															<span key={lv} className="block border border-bronze/50 px-1 py-1">
+																<span className="block font-pixel text-[9px] uppercase text-cream/60">Lv {lv}</span>
+																<span className="block text-xs font-bold text-cream">{relicBonus(r, lv)}</span>
+															</span>
+														))}
+													</span>
 												</>
 											}
 										>
@@ -349,10 +423,12 @@ function Mechanics() {
 									</li>
 								))}
 							</ul>
-							<p className="mt-2 text-xs text-cream/60">More relics join as the game grows. Bonuses shown at level 1.</p>
+							<p className="mt-2 text-xs text-cream/60">Hover a relic to see it grow with its holder's level. More relics join as the game grows.</p>
 						</div>
 					</div>
 				</Panel>
+
+				<RelicProgression />
 
 				<ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 					{MECHANICS.map((m) => (
