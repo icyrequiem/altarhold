@@ -263,7 +263,7 @@ const ARENA_STEPS = [
 // The relics in the game (data/relics/*.tres): their attribute points and their bonus at level 1.
 // Icons are the game's own (PixelRelics), rendered at 4x into img/relics/.
 const RELICS = [
-	{ id: "ember_heart", name: "Ember Heart", bonus: ["+2 STR", "+8 health regen"] },
+	{ id: "ember_heart", name: "Ember Heart", bonus: ["+2 STR", "+1.6 health regen/s"] },
 	{ id: "iron_bark", name: "Iron Bark", bonus: ["+2 STR", "+20 armor"] },
 	{ id: "giants_horn", name: "Giant's Horn", bonus: ["+2 STR", "+150 max health"] },
 	{ id: "wolf_fang", name: "Wolf Fang", bonus: ["+2 STR", "+10 attack damage"] },
@@ -275,7 +275,7 @@ const RELICS = [
 	{ id: "arcane_core", name: "Arcane Core", bonus: ["+2 INT", "+8% ability power"] },
 	{ id: "warding_stone", name: "Warding Stone", bonus: ["+2 INT", "+20 magic resist"] },
 	{ id: "starwell_phial", name: "Starwell Phial", bonus: ["+2 INT", "+150 max mana"] },
-	{ id: "tidal_shell", name: "Tidal Shell", bonus: ["+2 INT", "+5 mana regen"] },
+	{ id: "tidal_shell", name: "Tidal Shell", bonus: ["+2 INT", "+1 mana regen/s"] },
 ];
 
 // A hover (or focus, or tap) tip above its trigger, or above the nearest positioned parent when
