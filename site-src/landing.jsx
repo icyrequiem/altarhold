@@ -885,6 +885,7 @@ function Footer() {
 					<li><a href="timeline.html" className="text-muted hover:text-gold">Timeline</a></li>
 					<li><a href="#register" className="text-muted hover:text-gold">Register</a></li>
 					<li><a href="privacy.html" className="text-muted hover:text-gold">Privacy</a></li>
+					<li><a href="ai.html" className="text-muted hover:text-gold">AI use</a></li>
 				</ul>
 				<SocialLinks size={28} />
 			</div>
