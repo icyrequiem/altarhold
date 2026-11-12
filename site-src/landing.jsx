@@ -52,6 +52,7 @@ const ICONS = {
 	cliff: ["..........", "......kkk.", ".....kgggk", "....kggggk", "...kdddddk", "kkkkdbdbdk", "kgggdddddk", "kdbdbdbdbk", "kddddddddk", "kkkkkkkkkk"],
 	combo: ["....kk....", "...kllk...", "kkkkllkkkk", "kllllllllk", ".kllllllk.", "..kllllk..", ".kllkkllk.", ".klk..klk.", "kkk....kkk", ".........."],
 	fountain: ["....kk....", "...kwwk...", "..kw..wk..", "....kk....", "...kvvk...", "kkkkvvkkkk", "kvvvvvvvvk", ".kbbbbbbk.", ".kddddddk.", "..kkkkkk.."],
+	passive: ["....kk....", "...kllk...", "..kllllk..", ".kllllllk.", "kkkkllkkkk", "...kllk...", "...kllk...", "kkkkkkkkkk", "krrkggkvvk", "kkkkkkkkkk"],
 	paw: ["..kk..kk..", ".kgk..kgk.", ".kgk..kgk.", "..kk..kk..", "...kkkk...", "..kggggk..", ".kggggggk.", ".kggggggk.", "..kkkkkk..", ".........."],
 };
 
@@ -209,7 +210,12 @@ const MECHANICS = [
 	{
 		icon: "coin",
 		title: "No gold. No shop.",
-		body: "Minions, jungle monsters and enemy heroes give experience, not gold. Every level hands you points for Strength (health, armor, regeneration), Agility (attack speed, move speed, shorter cooldowns) or Intelligence (mana, magic resist, and ability power that boosts every ability's damage, heals and shields). Points in your hero's primary attribute also hit harder with basic attacks. You build your hero, not an inventory.",
+		body: "Minions, jungle monsters and enemy heroes give experience, not gold. Every level hands you points for Strength (health, armor, regeneration), Agility (attack speed, move speed, shorter cooldowns) or Intelligence (mana, magic resist, and ability power that boosts every ability's damage, heals and shields). Points in your hero's primary attribute also hit harder with basic attacks. Past level 20 levels come slower and give one point each. You build your hero, not an inventory.",
+	},
+	{
+		icon: "passive",
+		title: "Passives you choose",
+		body: "At levels 5, 10, 15 and 20 you pick one of three passives: a Strength, an Agility and an Intelligence one, each unlocked by enough points in its attribute (relic points count). They add stats or change how your own skills work, and every hero has twelve of their own, so the same hero can be built four different ways.",
 	},
 	{
 		icon: "feet",
@@ -261,11 +267,13 @@ const ARENA_STEPS = [
 ];
 
 // The relics in the game (data/relics/*.tres): their attribute points and their stat bonus at level 1.
-// The stat bonus grows with the holder's level (RelicData.level_multiplier: +5% of the level-1 bonus per
-// level above 1, Rules.RELIC_SCALING_PER_LEVEL); the attribute points never change.
+// The stat bonus grows with the RELIC's own level, 1 to 10, fed by the XP its holder loses to the relic
+// penalty (RelicData.level_multiplier: +10% of the level-1 bonus per relic level above 1,
+// Rules.RELIC_SCALING_PER_LEVEL; Rules.relic_xp_to_next); the attribute points never change.
 // Icons are the game's own (PixelRelics), rendered at 4x into img/relics/.
-const RELIC_SCALING_PER_LEVEL = 0.05;
-const RELIC_LEVELS = [1, 5, 10, 15, 20];
+const RELIC_SCALING_PER_LEVEL = 0.1;
+const RELIC_MAX_LEVEL = 10;
+const RELIC_LEVELS = [1, 3, 5, 7, 10];
 // Share of XP lost, by relics held (Rules.RELIC_XP_PENALTY).
 const RELIC_XP_PENALTY = [0, 16, 36, 65];
 
@@ -305,18 +313,18 @@ function Tip({ tip, label, className = "", anchored = true, children }) {
 	);
 }
 
-// Every relic's stat bonus at a spread of holder levels.
+// Every relic's stat bonus at a spread of relic levels.
 function RelicProgression() {
 	return (
 		<Panel className="mt-8" inner="p-6 sm:p-8">
 			<p className="font-pixel text-[11px] uppercase tracking-widest text-gold">Relic progression</p>
-			<h3 className="mt-1 font-heading text-2xl font-bold uppercase text-cream sm:text-3xl">A relic grows with its holder</h3>
+			<h3 className="mt-1 font-heading text-2xl font-bold uppercase text-cream sm:text-3xl">A relic grows while you hold it</h3>
 			<p className="mt-3 max-w-3xl text-sm text-cream/80">
-				Each relic gives two attribute points that never change, plus a stat bonus that grows by 5% of its starting value with every level its holder gains. At level 20 that bonus is almost double what it was at level 1. Hand a relic to a teammate and it takes on their level at once.
+				Each relic gives two attribute points that never change, plus a stat bonus. The experience a relic costs you is not lost: it feeds the relic, which levels up on its own from 1 to 10, each level adding 10% of its starting bonus. At level 10 the bonus is almost double. A relic keeps its level when you hand it to a teammate or drop it.
 			</p>
 			<div className="mt-5 overflow-x-auto">
 				<table className="w-full min-w-[34rem] border-collapse text-left text-sm">
-					<caption className="sr-only">Relic stat bonus by holder level</caption>
+					<caption className="sr-only">Relic stat bonus by relic level</caption>
 					<thead>
 						<tr className="border-b-2 border-bronze/60 font-pixel text-[10px] uppercase tracking-wider text-cream/70">
 							<th scope="col" className="py-2 pr-3 font-normal">Relic</th>
@@ -337,7 +345,7 @@ function RelicProgression() {
 								</th>
 								<td className="py-1.5 pr-3 text-cream/70">+2 {r.attr}, {r.stat}</td>
 								{RELIC_LEVELS.map((lv) => (
-									<td key={lv} className={`px-2 py-1.5 text-right tabular-nums ${lv === 20 ? "font-bold text-gold" : "text-cream"}`}>{relicBonus(r, lv)}</td>
+									<td key={lv} className={`px-2 py-1.5 text-right tabular-nums ${lv === RELIC_MAX_LEVEL ? "font-bold text-gold" : "text-cream"}`}>{relicBonus(r, lv)}</td>
 								))}
 							</tr>
 						))}
@@ -384,7 +392,7 @@ function Mechanics() {
 							))}
 						</ol>
 						<p className="mt-6 border-t-2 border-arena-light/30 pt-4 text-sm text-cream/80">
-							Relics grow stronger with their holder's level and stay with you when you die. A hero carries up to three and can hand one to a teammate standing close by. But every relic you hold cuts the experience you earn, a little for the first and a lot for the third. Nobody snowballs for free.
+							A hero carries up to three relics and can hand one to a teammate standing close by. Every relic you hold cuts the experience you earn, a little for the first and a lot for the third, and that experience levels the relic up instead. Die and you drop one at random: your killers get a moment to grab it first, then it is anyone's until it fades. Nobody snowballs for free.
 						</p>
 						<dl className="mt-4 grid grid-cols-4 gap-1 text-center" aria-label="Experience lost by relics held">
 							{RELIC_XP_PENALTY.map((cut, held) => (
@@ -400,7 +408,7 @@ function Mechanics() {
 								{RELICS.map((r) => (
 									<li key={r.id}>
 										<Tip
-											label={`${r.name}: ${relicSummary(r, 1)} at level 1, rising to ${relicBonus(r, 20)} ${r.stat} at level 20`}
+											label={`${r.name}: ${relicSummary(r, 1)} at relic level 1, rising to ${relicBonus(r, RELIC_MAX_LEVEL)} ${r.stat} at relic level ${RELIC_MAX_LEVEL}`}
 											className="block"
 											anchored={false}
 											tip={
@@ -423,7 +431,7 @@ function Mechanics() {
 									</li>
 								))}
 							</ul>
-							<p className="mt-2 text-xs text-cream/60">Hover a relic to see it grow with its holder's level. More relics join as the game grows.</p>
+							<p className="mt-2 text-xs text-cream/60">Hover a relic to see it grow with its own level. More relics join as the game grows.</p>
 						</div>
 					</div>
 				</Panel>
@@ -431,8 +439,9 @@ function Mechanics() {
 				<RelicProgression />
 
 				<ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-					{MECHANICS.map((m) => (
-						<li key={m.title}>
+					{MECHANICS.map((m, i) => (
+						// A lone card on the last row of three sits in the middle.
+						<li key={m.title} className={i === MECHANICS.length - 1 && MECHANICS.length % 3 === 1 ? "lg:col-start-2" : ""}>
 							<Panel className="h-full" inner="p-6">
 								<PixelIcon name={m.icon} size={40} />
 								<h3 className="mt-4 font-heading text-xl font-bold uppercase text-gold">{m.title}</h3>
@@ -619,7 +628,7 @@ function Heroes() {
 		<section id="heroes" aria-labelledby="heroes-title" className="scroll-mt-20 py-20 sm:py-28">
 			<div className="mx-auto max-w-6xl px-4 sm:px-6">
 				<SectionTitle kicker="The roster" title="Twenty heroes, no items to hide behind" id="heroes-title">
-					Each hero has a primary attribute, a passive and four abilities. They start with a few attribute points weighted toward their primary, and every level adds more for you to spend.
+					Each hero has a primary attribute, an innate passive and four abilities, plus twelve passives of their own to pick from as they level. They start with a few attribute points weighted toward their primary, and every level adds more for you to spend.
 				</SectionTitle>
 
 				<div className="mt-12 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
